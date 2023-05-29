@@ -41,8 +41,8 @@ nltk.download('webtext')
 nltk.download('treebank')
 nltk.download('gutenberg')
 nltk.download('genesis')
-nltk.download('trigram_collocations')
-nltk.download('quadgram_collocations')
+#nltk.download('trigram_collocations')
+#nltk.download('quadgram_collocations')
 
 
 # Define a function to scrape Google search results and create a dataframe
