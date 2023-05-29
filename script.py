@@ -211,26 +211,27 @@ def analyze_serps(query):
     # writer._save()
     file_name = f"{query}_NLP_Based_SERP_Results.csv"
     link_text = "Click here to download NLP SERP Result"
-    if df.empty:
-        st.write('No data available to download.')
-    else:
-        download_link = create_download_link(df, 'result.csv', 'Download Result')
-        st.markdown(download_link, unsafe_allow_html=True)
-    st.write(df)
-    
-    # Return the final dataframe
-    return df
+download_link = create_download_link(df, filename, link_text)
+
+if download_link is not None:
+    st.markdown(download_link, unsafe_allow_html=True)
+else:
+    st.write('No data available to download.')
 
 def create_download_link(df, file_name, link_text):
-    # Convert DataFrame to CSV string
-    csv_string = df.to_csv(index=False)
+    # Check if the DataFrame is not empty
+    if len(df) > 0:
+        # Convert DataFrame to CSV string
+        csv_string = df.to_csv(index=False)
+        
+        # Encode CSV string as base64
+        b64 = base64.b64encode(csv_string.encode()).decode()
+        
+        # Create the download link
+        href = f'<a href="data:text/csv;base64,{b64}" download="{file_name}">{link_text}</a>'
+        return href
     
-    # Encode CSV string as base64
-    b64 = base64.b64encode(csv_string.encode()).decode()
-    
-    # Create the download link
-    href = f'<a href="data:text/csv;base64,{b64}" download="{file_name}">{link_text}</a>'
-    return href
+    return None
 
 
 # Define a function to summarize the NLP results from the dataframe
