@@ -214,7 +214,7 @@ def analyze_serps(query):
     if result_df.empty:
         st.write('No data available to download.')
     else:
-    download_link = create_download_link(result_df, 'result.csv', 'Download Result')
+        download_link = create_download_link(result_df, 'result.csv', 'Download Result')
         st.markdown(download_link, unsafe_allow_html=True)
     st.write(df)
     
