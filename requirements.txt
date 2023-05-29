@@ -7,3 +7,5 @@ streamlit
 apify-client
 transformers
 python-docx
+base64
+io
