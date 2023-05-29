@@ -211,13 +211,15 @@ def analyze_serps(query):
     # writer._save()
     file_name = f"{query}_NLP_Based_SERP_Results.csv"
     link_text = "Click here to download NLP SERP Result"
-download_link = create_download_link_csv(df, file_name, link_text)
+    download_link = create_download_link_csv(df, file_name, link_text)
 
-if download_link is not None:
-    st.markdown(download_link, unsafe_allow_html=True)
-else:
-    st.write('No data available to download.')
-
+    if download_link is not None:
+        st.markdown(download_link, unsafe_allow_html=True)
+    else:
+        st.write('No data available to download.')
+    st.write(df)
+    
+    
 def create_download_link_csv(df, file_name, link_text):
     # Check if the DataFrame is not empty
     if len(df) > 0:
