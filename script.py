@@ -25,24 +25,27 @@ import transformers
 from transformers import GPT2Tokenizer
 from docx import Document
 import json
+import base64
+from io import BytesIO
+
 #openai.api_key = openai.api_key = os.environ['openai_api_key']
 tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
 
 
-nltk.download('stopwords')
-nltk.download('punkt')
-nltk.download('averaged_perceptron_tagger')
-nltk.download('tagsets')
-nltk.download('words')
-nltk.download('maxent_ne_chunker')
-nltk.download('vader_lexicon')
-nltk.download('inaugural')
-nltk.download('webtext')
-nltk.download('treebank')
-nltk.download('gutenberg')
-nltk.download('genesis')
-#nltk.download('trigram_collocations')
-#nltk.download('quadgram_collocations')
+# nltk.download('stopwords')
+# nltk.download('punkt')
+# nltk.download('averaged_perceptron_tagger')
+# nltk.download('tagsets')
+# nltk.download('words')
+# nltk.download('maxent_ne_chunker')
+# nltk.download('vader_lexicon')
+# nltk.download('inaugural')
+# nltk.download('webtext')
+# nltk.download('treebank')
+# nltk.download('gutenberg')
+# nltk.download('genesis')
+# nltk.download('trigram_collocations')
+# nltk.download('quadgram_collocations')
 
 
 # Define a function to scrape Google search results and create a dataframe
@@ -202,16 +205,24 @@ def analyze_serps(query):
     #writer = pd.ExcelWriter('NLP_Based_SERP_Results.xlsx', engine='xlsxwriter')
     #df.to_excel(writer, sheet_name='Sheet1', index=False)
     #writer.save()
-    file_name = f"{query}_NLP_Based_SERP_Results.xlsx"
-    writer = pd.ExcelWriter(file_name, engine='xlsxwriter')
-    df.to_excel(writer, sheet_name='Sheet1', index=False)
-    writer._save()
+    # file_name = f"{query}_NLP_Based_SERP_Results.xlsx"
+    # writer = pd.ExcelWriter(file_name, engine='xlsxwriter')
+    # df.to_excel(writer, sheet_name='Sheet1', index=False)
+    # writer._save()
+    file_name = f"{query}_NLP_Based_SERP_Results.csv"
+    link_text = "Click here to download NLP SERP Result"
+    
+    st.markdown(create_download_link(df, file_name, link_text), unsafe_allow_html=True)
     st.write(df)
     
     # Return the final dataframe
     return df
 
-
+def create_download_link(df, file_name, link_text):
+    csv = df.to_csv(index=False)
+    b64 = base64.b64encode(csv.encode()).decode()
+    href = f'<a href="data:file/csv;base64,{b64}" download="{file_name}">{link_text}</a>'
+    return href
 
 
 # Define a function to summarize the NLP results from the dataframe
@@ -502,12 +513,31 @@ def generate_article(topic, model="gpt-3.5-turbo", max_tokens_outline=2000, max_
     final_content = '\n'.join(improved_sections)
     #st.markdown(final_content,unsafe_allow_html=True)
     file_name = f"{query}_final_article.docx"
-    document = Document()
-    document.add_paragraph(final_content)
-    document.save(file_name)
+    link_text = "Click here to download complete article"
+    st.markdown(create_download_link(final_content, file_name, link_text), unsafe_allow_html=True)
+
+
 
    
-
+def create_download_link(string, file_name, link_text):
+    # Create a new Word document
+    doc = Document()
+    
+    # Add the string content to the document
+    doc.add_paragraph(string)
+    
+    # Save the document to a BytesIO object
+    doc_io = BytesIO()
+    doc.save(doc_io)
+    doc_io.seek(0)
+    
+    # Encode the document as base64
+    doc_base64 = base64.b64encode(doc_io.read()).decode()
+    
+    # Create the download link
+    href = f'<a href="data:application/vnd.openxmlformats-officedocument.wordprocessingml.document;base64,{doc_base64}" download="{file_name}">{link_text}</a>'
+    
+    return href
 
 
 
@@ -543,7 +573,6 @@ def main():
 
 if __name__ == "__main__":
     main()
-
 
 
 
