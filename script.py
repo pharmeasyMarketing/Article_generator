@@ -523,8 +523,9 @@ def create_download_link(string, file_name, link_text):
     # Create a new Word document
     doc = Document()
     
-    # Add the string content to the document
-    doc.add_paragraph(string)
+    if string:
+        # Add the string content to the document
+        doc.add_paragraph(string)
     
     # Save the document to a BytesIO object
     doc_io = BytesIO()
