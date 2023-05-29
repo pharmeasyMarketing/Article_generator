@@ -211,7 +211,7 @@ def analyze_serps(query):
     # writer._save()
     file_name = f"{query}_NLP_Based_SERP_Results.csv"
     link_text = "Click here to download NLP SERP Result"
-    if result_df.empty:
+    if df.empty:
         st.write('No data available to download.')
     else:
         download_link = create_download_link(result_df, 'result.csv', 'Download Result')
