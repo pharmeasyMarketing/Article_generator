@@ -211,29 +211,18 @@ def analyze_serps(query):
     # writer._save()
     file_name = f"{query}_NLP_Based_SERP_Results.csv"
     link_text = "Click here to download NLP SERP Result"
-    download_link = create_download_link_csv(df, file_name, link_text)
-
-    if download_link is not None:
-        st.markdown(download_link, unsafe_allow_html=True)
-    else:
-        st.write('No data available to download.')
+    
+    st.markdown(create_download_link_csv(df, file_name, link_text), unsafe_allow_html=True)
     st.write(df)
     
-    
+    # Return the final dataframe
+    return df
+
 def create_download_link_csv(df, file_name, link_text):
-    # Check if the DataFrame is not empty
-    if len(df) > 0:
-        # Convert DataFrame to CSV string
-        csv_string = df.to_csv(index=False)
-        
-        # Encode CSV string as base64
-        b64 = base64.b64encode(csv_string.encode()).decode()
-        
-        # Create the download link
-        href = f'<a href="data:text/csv;base64,{b64}" download="{file_name}">{link_text}</a>'
-        return href
-    
-    return None
+    csv = df.to_csv(index=False)
+    b64 = base64.b64encode(csv.encode()).decode()
+    href = f'<a href="data:file/csv;base64,{b64}" download="{file_name}">{link_text}</a>'
+    return href
 
 
 # Define a function to summarize the NLP results from the dataframe
@@ -534,9 +523,8 @@ def create_download_link(string, file_name, link_text):
     # Create a new Word document
     doc = Document()
     
-    if string:
-        # Add the string content to the document
-        doc.add_paragraph(string)
+    # Add the string content to the document
+    doc.add_paragraph(string)
     
     # Save the document to a BytesIO object
     doc_io = BytesIO()
