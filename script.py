@@ -556,8 +556,8 @@ Improves the generated outline with the required sections.
 Uses GPT-3.5 to write the article based on the improved sections.
 After generating the article, it further improves the content and creates the final draft.
 """)
-   st.header("Upcoming Features")
-   st.markdown("""
+    st.header("Upcoming Features")
+    st.markdown("""
 
 References at the end of the article.
 Option to define the desired word count for the article.
