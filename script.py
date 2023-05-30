@@ -548,7 +548,7 @@ def main():
     st.title('PharmEasy Article Generator')
     
    st.header("Current Features")
-st.markdown("""
+   st.markdown("""
 
 Scrapes the top 10 search results and creates SEO semantics using NLP.
 Sends the SEO semantics to GPT-3.5 to generate an outline based on the semantics.
@@ -556,8 +556,8 @@ Improves the generated outline with the required sections.
 Uses GPT-3.5 to write the article based on the improved sections.
 After generating the article, it further improves the content and creates the final draft.
 """)
-st.header("Upcoming Features")
-st.markdown("""
+   st.header("Upcoming Features")
+   st.markdown("""
 
 References at the end of the article.
 Option to define the desired word count for the article.
