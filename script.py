@@ -547,8 +547,8 @@ def main():
 
     st.title('PharmEasy Article Generator')
     
-   st.header("Current Features")
-   st.markdown("""
+    st.header("Current Features")
+    st.markdown("""
 
 Scrapes the top 10 search results and creates SEO semantics using NLP.
 Sends the SEO semantics to GPT-3.5 to generate an outline based on the semantics.
