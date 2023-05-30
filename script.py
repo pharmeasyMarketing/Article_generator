@@ -542,18 +542,25 @@ def create_download_link(string, file_name, link_text):
 
 
 def main():
-    st.set_page_config(page_title="Article Generator")
+    st.set_page_config(page_title="PharmEasy Article Generator")
 
 
-    st.title('PharmEasy Article Generator with Semantic SEO Understanding')
+    st.title('PharmEasy Article Generator')
     
     st.markdown('''
-    Welcome to the long-form article generator! This application leverages advanced AI to create comprehensive articles based on the topic you provide. 
+    Current Features - 
+          * It Scrapes top 10 result and create SEO Sementics using NLP.
+          * SEO sementics then send to GPT 3.5 and promt it to generate an outline based on sementic.
+          * Then generated outline is improved with the required sections.
+          * GPT 3.5 writes the article based on improved section.
+          * After generating the article, it improves the generated article and create final Draft.
+          
+     Upcoming Features - 
+         * References at the end of article.
+         * Option to define word count for the article.
+         * Automatically draft saving in WordPress.
+         * Top 5 FAQs from people also ask. 
 
-    Not only does it generate articles, but it also includes a Semantic SEO understanding. This means it takes into consideration the semantic context and relevance of your topic, based on current search engine results.
-
-    Just input your topic below and let the AI do its magic!
-    
     ** If you get an error, (sometimes OpenAI will be overloaded and not work), just press generate again and it should start where it left off.
     ''')
    
