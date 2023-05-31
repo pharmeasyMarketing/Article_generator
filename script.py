@@ -27,6 +27,8 @@ from docx import Document
 import json
 import base64
 from io import BytesIO
+# import markdown
+# import html2text
 
 #openai.api_key = openai.api_key = os.environ['openai_api_key']
 tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
@@ -154,7 +156,41 @@ def main(query):
 
 
 
+@st.cache_data(show_spinner=False)
+def references(url):
+    try:
+
+        words_to_match = ['references', 'reference', 'sources', 'source', 'citation', 'citations']
+
+# Send a GET request to the URL
+        response = requests.get(url)
+        html_content = response.content
+
+# Parse the HTML content using BeautifulSoup
+        soup = BeautifulSoup(html_content, 'html.parser')
+
+# Find the first <ul> or <ol> element after the matching words and extract the text
+        matched_element_text = None
+        for word in words_to_match:
+            # element = soup.find(text=lambda t: t and word in t.lower())
+            element = soup.find(string=lambda t: t and word in t.lower())
+
+            if element:
+                # Find the first <ul> or <ol> element after the matching words
+                ul_element = element.find_next(['ul', 'ol'])
+                if ul_element:
+                    matched_element_text = ul_element.get_text(strip=True)
+                    break  # Stop after finding the first match
+
+# Print the scraped text
+    except:
+        matched_element_text = None
+    if matched_element_text:
+#       print(matched_element_text)
+        return matched_element_text
+
 # Define the main function to scrape Google search results and analyze the article text
+
 
 @st.cache_data(show_spinner=False)
 def analyze_serps(query):
@@ -166,6 +202,11 @@ def analyze_serps(query):
         #st.write(url)
         article_text = scrape_article(url)
         df.at[index, 'Article Text'] = article_text
+
+    for index, row in df.iterrows():
+        url = row['URL']
+        referencess = references(url)
+        df.at[index, 'Reference URLs'] = referencess        
     # Analyze the article text for each search result and store the NLP results in the dataframe
     for index, row in df.iterrows():
         text = row['Article Text']
@@ -511,6 +552,14 @@ def generate_article(topic, model="gpt-3.5-turbo", max_tokens_outline=2000, max_
 
     status.text('Finished')
     final_content = '\n'.join(improved_sections)
+    # Set the display option to show the complete text of a column
+    pd.set_option('display.max_colwidth', None)
+
+    # html = markdown.markdown(final_content)
+    # plain_text = html2text.html2text(html)
+
+    refrencess = results.get('Reference URLs')
+    final_content = final_content + '\n' + "References" + '\n' + str(refrencess)
     #st.markdown(final_content,unsafe_allow_html=True)
     file_name = f"{query}_final_article.docx"
     link_text = "Click here to download complete article"
@@ -581,7 +630,6 @@ def main():
 
 if __name__ == "__main__":
     main()
-
 
 
 
