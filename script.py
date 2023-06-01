@@ -29,6 +29,7 @@ import base64
 from io import BytesIO
 # import markdown
 # import html2text
+from markdownify import markdownify
 
 #openai.api_key = openai.api_key = os.environ['openai_api_key']
 tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
@@ -157,37 +158,63 @@ def main(query):
 
 
 @st.cache_data(show_spinner=False)
+def remove_classes(element):
+    if isinstance(element, Tag):
+        element.attrs = {}
+        for child in element.children:
+            remove_classes(child)
+
+
+@st.cache_data(show_spinner=False)
 def references(url):
     try:
-
+        
         words_to_match = ['references', 'reference', 'sources', 'source', 'citation', 'citations']
 
-# Send a GET request to the URL
+        # Send a GET request to the URL
         response = requests.get(url)
         html_content = response.content
 
-# Parse the HTML content using BeautifulSoup
+        # Parse the HTML content using BeautifulSoup
         soup = BeautifulSoup(html_content, 'html.parser')
 
-# Find the first <ul> or <ol> element after the matching words and extract the text
-        matched_element_text = None
+        # Find the first <ul> or <ol> element after the matching words and extract the HTML
+        matched_element_html = None
         for word in words_to_match:
-            # element = soup.find(text=lambda t: t and word in t.lower())
             element = soup.find(string=lambda t: t and word in t.lower())
-
             if element:
                 # Find the first <ul> or <ol> element after the matching words
                 ul_element = element.find_next(['ul', 'ol'])
                 if ul_element:
-                    matched_element_text = ul_element.get_text(strip=True)
-                    break  # Stop after finding the first match
+                    if ul_element.name == 'ul':
+                        ul_element.name = ' '  # Replace <ul> with <ol>
+                if ul_element:
+                    if ul_element.name == 'ol':
+                        ul_element.name = ' '  # Replace <ul> with <ol>                        
 
-# Print the scraped text
+                    # Check if any <li> element within the <ul> or <ol> contains the specified text
+                    if any('https://' in li.text or 'http://' in li.text or 'www' in li.text for li in ul_element.find_all('li')):
+                        matched_element_html = str(ul_element)
+                        break  # Stop after finding the first match
+
+        # Remove classes from the extracted HTML content
+        if matched_element_html:
+            matched_element_soup = BeautifulSoup(matched_element_html, 'html.parser')
+            remove_classes(matched_element_soup)
+            matched_element_html = str(matched_element_soup)
+
+        # Convert HTML to Markdown
+#         matched_element_markdown = markdownify(matched_element_html)
+#         print(matched_element_markdown)
+        
+        # Return the scraped Markdown
+        # print(matched_element_html)
+        return matched_element_html
+
+
     except:
-        matched_element_text = None
-    if matched_element_text:
-#       print(matched_element_text)
-        return matched_element_text
+        # print("except")
+        return None
 
 # Define the main function to scrape Google search results and analyze the article text
 
@@ -199,17 +226,16 @@ def analyze_serps(query):
     # Scrape article text for each search result and store it in the dataframe
     for index, row in df.iterrows():
         url = row['URL']
-        #st.write(url)
         article_text = scrape_article(url)
         df.at[index, 'Article Text'] = article_text
-
     for index, row in df.iterrows():
         url = row['URL']
         referencess = references(url)
-        df.at[index, 'Reference URLs'] = referencess        
+        df.at[index, 'Reference URLs'] = referencess
     # Analyze the article text for each search result and store the NLP results in the dataframe
     for index, row in df.iterrows():
         text = row['Article Text']
+        # referencing = row['Reference URLs'] 
         # Tokenize the text and remove stop words
         tokens = [word.lower() for word in word_tokenize(text) if word.isalpha() and word.lower() not in stopwords.words('english') and 'contact' not in word.lower() and 'admin' not in word.lower()]
         # Calculate the frequency distribution of the tokens
@@ -233,8 +259,10 @@ def analyze_serps(query):
         # Calculate the part-of-speech tags for the text
         pos_tags = nltk.pos_tag(tokens)
         # Store the NLP results in the dataframe
-        df.at[index, "Facts"] = generate_content3(text)
         df.at[index, 'Most Common Words'] = ', '.join([word[0] for word in most_common])
+        df.at[index, 'reference urls'] = row['Reference URLs']
+        Reference_final_output = ', '.join(str(url) for url in df['Reference URLs'] if url is not None)
+        df.at[0, 'Final_Reference_Output'] = f"<ol>{Reference_final_output}</ol>"
         df.at[index, 'Least Common Words'] = ', '.join([word[0] for word in least_common])
         df.at[index, 'Most Common Bigrams'] = ', '.join([f'{bigram[0]} {bigram[1]}' for bigram in bigrams])
         df.at[index, 'Most Common Trigrams'] = ', '.join([f'{trigram[0]} {trigram[1]} {trigram[2]}' for trigram in trigrams])
@@ -243,13 +271,15 @@ def analyze_serps(query):
         # Replace any remaining commas with spaces in the Article Text column
         df.at[index, 'Article Text'] = ' '.join(row['Article Text'].replace(',', ' ').split())
     # Save the final dataframe as an Excel file
-    #writer = pd.ExcelWriter('NLP_Based_SERP_Results.xlsx', engine='xlsxwriter')
-    #df.to_excel(writer, sheet_name='Sheet1', index=False)
-    #writer.save()
-    # file_name = f"{query}_NLP_Based_SERP_Results.xlsx"
-    # writer = pd.ExcelWriter(file_name, engine='xlsxwriter')
+
+    # print(markdownify(df.at[0, 'Final_Reference_Output']))
+    # filename = f"{query}_NLP_Based_SERP_RESULT.xlsx"
+    # writer = pd.ExcelWriter(filename, engine='xlsxwriter')
     # df.to_excel(writer, sheet_name='Sheet1', index=False)
     # writer._save()
+    # print(f"NLP based serp result file saved as '{filename}' ")
+    # Return the final dataframe
+    
     file_name = f"{query}_NLP_Based_SERP_Results.csv"
     link_text = "Click here to download NLP SERP Result"
     
@@ -555,10 +585,9 @@ def generate_article(topic, model="gpt-3.5-turbo", max_tokens_outline=2000, max_
     # Set the display option to show the complete text of a column
     pd.set_option('display.max_colwidth', None)
 
-    # html = markdown.markdown(final_content)
-    # plain_text = html2text.html2text(html)
+    
 
-    refrencess = results.get('Reference URLs')
+    refrencess = markdownify(results.at[0, 'Final_Reference_Output'])
     final_content = final_content + '\n' + "References" + '\n' + str(refrencess)
     #st.markdown(final_content,unsafe_allow_html=True)
     file_name = f"{query}_final_article.docx"
@@ -582,6 +611,8 @@ def create_download_link(string, file_name, link_text):
     
     # Encode the document as base64
     doc_base64 = base64.b64encode(doc_io.read()).decode()
+    # html = markdown.markdown(final_content)
+    # plain_text = html2text.html2text(html)
     
     # Create the download link
     href = f'<a href="data:application/vnd.openxmlformats-officedocument.wordprocessingml.document;base64,{doc_base64}" download="{file_name}">{link_text}</a>'
