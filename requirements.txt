@@ -8,5 +8,4 @@ apify-client
 transformers
 python-docx
 markdownify
-markdown
-html2text
+
