@@ -27,8 +27,8 @@ from docx import Document
 import json
 import base64
 from io import BytesIO
-import markdown
-import html2text
+# import markdown
+# import html2text
 from markdownify import markdownify
 
 #openai.api_key = openai.api_key = os.environ['openai_api_key']
