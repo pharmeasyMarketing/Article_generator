@@ -156,14 +156,14 @@ def main(query):
     return df
 
 
-# @st.cache_data(show_spinner=False)
-def remove_classes(element):
-    if isinstance(element, Tag):
-        element.attrs = {}
-        for child in element.children:
-            remove_classes(child)
+# # @st.cache_data(show_spinner=False)
+# def remove_classes(element):
+#     if isinstance(element, Tag):
+#         element.attrs = {}
+#         for child in element.children:
+#             remove_classes(child)
 
-# @st.cache_data(show_spinner=False)
+@st.cache_data(show_spinner=False)
 def references(url):
     try:
         
@@ -198,7 +198,7 @@ def references(url):
         # Remove classes from the extracted HTML content
         if matched_element_html:
             matched_element_soup = BeautifulSoup(matched_element_html, 'html.parser')
-            remove_classes(matched_element_soup)
+#             remove_classes(matched_element_soup)
             matched_element_html = str(matched_element_soup)
 
         # Convert HTML to Markdown
