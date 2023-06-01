@@ -580,19 +580,19 @@ def generate_article(topic, model="gpt-3.5-turbo", max_tokens_outline=2000, max_
 
     status.text('Finished')
     final_content = '\n'.join(improved_sections)
-    html = markdown.markdown(final_content)
-    plain_text = html2text.html2text(html)
+#     html = markdown.markdown(final_content)
+#     plain_text = html2text.html2text(html)
     # Set the display option to show the complete text of a column
     pd.set_option('display.max_colwidth', None)
 
     
 
     refrencess = markdownify(results.at[0, 'Final_Reference_Output'])
-    plain_text = plain_text + '\n' + "References" + '\n' + str(refrencess)
+    final_content = final_content + '\n' + "References" + '\n' + str(refrencess)
     #st.markdown(final_content,unsafe_allow_html=True)
     file_name = f"{query}_final_article.docx"
     link_text = "Click here to download complete article"
-    st.markdown(create_download_link(plain_text, file_name, link_text), unsafe_allow_html=True)
+    st.markdown(create_download_link(final_content, file_name, link_text), unsafe_allow_html=True)
 
 
 
