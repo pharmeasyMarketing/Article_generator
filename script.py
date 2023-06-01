@@ -159,8 +159,7 @@ def main(query):
 # @st.cache_data(show_spinner=False)
 def remove_classes(element):
     if isinstance(element, Tag):
-        if 'class' in element.attrs:
-            del element['class']
+        element.attrs = {}
         for child in element.children:
             remove_classes(child)
 
