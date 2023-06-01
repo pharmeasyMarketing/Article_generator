@@ -1,7 +1,7 @@
 # Import necessary libraries
 import requests
 import os
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Tag
 import pandas as pd
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
