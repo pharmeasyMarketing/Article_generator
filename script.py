@@ -156,7 +156,7 @@ def main(query):
     return df
 
 
-@st.cache_data(show_spinner=False)
+# @st.cache_data(show_spinner=False)
 def remove_classes(element):
     if isinstance(element, Tag):
         if 'class' in element.attrs:
@@ -164,7 +164,7 @@ def remove_classes(element):
         for child in element.children:
             remove_classes(child)
 
-@st.cache_data(show_spinner=False)
+# @st.cache_data(show_spinner=False)
 def references(url):
     try:
         
