@@ -611,23 +611,21 @@ from docx import Document
 from io import BytesIO
 import base64
 
+from docx import Document
+
 def create_download_link(string, file_name, link_text):
-    # Create a new HTML document
+    # Create a new Word document
     doc = Document()
     
     # Add the string content to the document
     doc.add_paragraph(string)
     
-    # Save the document to a BytesIO object
-    doc_io = BytesIO()
-    doc.save(doc_io)
-    doc_io.seek(0)
-    
-    # Encode the document as base64
-    doc_base64 = base64.b64encode(doc_io.read()).decode()
+    # Save the document as HTML
+    file_path = f"{file_name}.html"
+    doc.save(file_path)
     
     # Create the download link
-    href = f'<a href="data:text/html;base64,{doc_base64}" download="{file_name}">{link_text}</a>'
+    href = f'<a href="{file_path}" download="{file_name}.html">{link_text}</a>'
     
     return href
 
