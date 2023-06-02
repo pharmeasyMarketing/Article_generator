@@ -580,29 +580,7 @@ def generate_article(topic, model="gpt-3.5-turbo", max_tokens_outline=500, max_t
 #         final_reference_output = markdownify(results.at[0, 'Final_Reference_Output'])
 #         improved_sections.append((improved_section, final_reference_output))
         return(improved_sections)
-          # WordPress credentials
-        url = 'https://peblog.pivotroots.com/xmlrpc.php'
-        username = 'Harshraj'
-        password = "QeUei(FvTvJh&obsnN(*BUWm"
-
-        # Create a WordPress client
-        client = Client(url, username, password)
-
-        # Create a new post object
-        post = WordPressPost()
-
-        # Set the post title and content
-        post.title = querry
-        post.content = improved_section
-
-        # Set the post status as 'draft'
-        post.post_status = 'draft'
-
-        # Publish the post
-        client.call(NewPost(post))
-
-
-
+  
     status.text('Finished')
     final_content = '\n'.join(improved_sections)
     # html = markdown.markdown(final_content)
