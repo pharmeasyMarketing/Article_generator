@@ -588,7 +588,7 @@ def generate_article(topic, model="gpt-3.5-turbo", max_tokens_outline=500, max_t
     refrencess = markdownify(results.at[0, 'Final_Reference_Output'])
     final_content = final_content + '\n' + "References" + '\n' + str(refrencess)
     # st.markdown(final_content,unsafe_allow_html=True)
-    file_name = f"{query}_final_article.docx"
+    file_name = f"{query}_final_article.html"
     link_text = "Click here to download complete article"
     st.markdown(create_download_link(final_content, file_name, link_text), unsafe_allow_html=True)
     
