@@ -594,13 +594,6 @@ def generate_article(topic, model="gpt-3.5-turbo", max_tokens_outline=500, max_t
     link_text = "Click here to download complete article"
     st.markdown(create_download_link(final_content, file_name, link_text), unsafe_allow_html=True)
 
-
-
-   
-from docxtpl import DocxTemplate
-import base64
-from io import BytesIO
-
 from docx import Document
 from io import BytesIO
 import base64
