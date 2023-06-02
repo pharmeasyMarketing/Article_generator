@@ -597,18 +597,21 @@ def generate_article(topic, model="gpt-3.5-turbo", max_tokens_outline=500, max_t
 
 
    
+from docxtpl import DocxTemplate
+import base64
+from io import BytesIO
+
 def create_download_link(string, file_name, link_text):
-    # Create a new Word document
-    doc = Document()
+    # Load the Word document template
+    doc = DocxTemplate('template.docx')  # Replace 'template.docx' with the path to your own Word template
     
-    # Split the string content into paragraphs
-    paragraphs = string.split('\n')
+    # Create a context dictionary to fill in the template
+    context = {'content': string}
     
-    # Add each paragraph to the document
-    for paragraph in paragraphs:
-        doc.add_paragraph(paragraph)
+    # Render the template with the context
+    doc.render(context)
     
-    # Save the document to a BytesIO object
+    # Save the rendered document to a BytesIO object
     doc_io = BytesIO()
     doc.save(doc_io)
     doc_io.seek(0)
