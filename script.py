@@ -607,17 +607,30 @@ def preprocess_content(content):
 
     return content
 
+from docx import Document
+from io import BytesIO
+import base64
+
 def create_download_link(string, file_name, link_text):
-    # Preprocess the content
-    string = preprocess_content(string)
-
-    # Convert Markdown to DOCX using pypandoc
-    docx_content = pypandoc.convert_text(string, 'docx', format='md')
-
+    # Create a new HTML document
+    doc = Document()
+    
+    # Add the string content to the document
+    doc.add_paragraph(string)
+    
+    # Save the document to a BytesIO object
+    doc_io = BytesIO()
+    doc.save(doc_io)
+    doc_io.seek(0)
+    
+    # Encode the document as base64
+    doc_base64 = base64.b64encode(doc_io.read()).decode()
+    
     # Create the download link
-    href = f'<a href="data:application/vnd.openxmlformats-officedocument.wordprocessingml.document;base64,{base64.b64encode(docx_content).decode()}" download="{file_name}">{link_text}</a>'
+    href = f'<a href="data:text/html;base64,{doc_base64}" download="{file_name}">{link_text}</a>'
     
     return href
+
 
 # Your code
 
