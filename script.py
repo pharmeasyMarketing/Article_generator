@@ -29,7 +29,9 @@ import base64
 from io import BytesIO
 # import markdown
 # import html2text
-from markdownify import markdownify
+from markdownify import markdownify 
+from wordpress_xmlrpc import Client, WordPressPost
+from wordpress_xmlrpc.methods.posts import NewPost
 
 #openai.api_key = openai.api_key = os.environ['openai_api_key']
 tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
@@ -578,6 +580,27 @@ def generate_article(topic, model="gpt-3.5-turbo", max_tokens_outline=500, max_t
 #         final_reference_output = markdownify(results.at[0, 'Final_Reference_Output'])
 #         improved_sections.append((improved_section, final_reference_output))
         return(improved_sections)
+          # WordPress credentials
+        url = 'https://peblog.pivotroots.com/xmlrpc.php'
+        username = 'Harshraj'
+        password = "QeUei(FvTvJh&obsnN(*BUWm"
+
+        # Create a WordPress client
+        client = Client(url, username, password)
+
+        # Create a new post object
+        post = WordPressPost()
+
+        # Set the post title and content
+        post.title = querry
+        post.content = improved_section
+
+        # Set the post status as 'draft'
+        post.post_status = 'draft'
+
+        # Publish the post
+        client.call(NewPost(post))
+
 
 
     status.text('Finished')
@@ -593,32 +616,8 @@ def generate_article(topic, model="gpt-3.5-turbo", max_tokens_outline=500, max_t
     file_name = f"{query}_final_article.docx"
     link_text = "Click here to download complete article"
     st.markdown(create_download_link(final_content, file_name, link_text), unsafe_allow_html=True)
-    
-    from wordpress_xmlrpc import Client, WordPressPost
-    from wordpress_xmlrpc.methods.posts import NewPost
-
-    # WordPress credentials
-    url = 'https://peblog.pivotroots.com/xmlrpc.php'
-    username = 'Harshraj'
-    password = "QeUei(FvTvJh&obsnN(*BUWm"
-
-    # Create a WordPress client
-    client = Client(url, username, password)
-
-    # Create a new post object
-    post = WordPressPost()
-
-    # Set the post title and content
-    post.title = querry
-    post.content = improved_section
-
-    # Set the post status as 'draft'
-    post.post_status = 'draft'
-
-    # Publish the post
-    client.call(NewPost(post))
-
-    
+   
+      
 from io import BytesIO
 import base64
 from docx import Document
