@@ -601,8 +601,12 @@ def create_download_link(string, file_name, link_text):
     # Create a new Word document
     doc = Document()
     
-    # Add the string content to the document
-    doc.add_paragraph(string)
+    # Split the string content into paragraphs
+    paragraphs = string.split('\n')
+    
+    # Add each paragraph to the document
+    for paragraph in paragraphs:
+        doc.add_paragraph(paragraph)
     
     # Save the document to a BytesIO object
     doc_io = BytesIO()
@@ -611,8 +615,6 @@ def create_download_link(string, file_name, link_text):
     
     # Encode the document as base64
     doc_base64 = base64.b64encode(doc_io.read()).decode()
-    # html = markdown.markdown(final_content)
-    # plain_text = html2text.html2text(html)
     
     # Create the download link
     href = f'<a href="data:application/vnd.openxmlformats-officedocument.wordprocessingml.document;base64,{doc_base64}" download="{file_name}">{link_text}</a>'
