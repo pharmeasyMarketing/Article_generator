@@ -579,7 +579,7 @@ def generate_article(topic, model="gpt-3.5-turbo", max_tokens_outline=500, max_t
 
 
     status.text('Finished')
-    final_content = '\n'.join(improved_sections)
+    final_content = improved_sections
 #     html = markdown.markdown(final_content)
 #     plain_text = html2text.html2text(html)
     # Set the display option to show the complete text of a column
