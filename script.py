@@ -610,7 +610,7 @@ def generate_article(topic, model="gpt-3.5-turbo", max_tokens_outline=500, max_t
 
     # Set the post title and content
     post.title = querry
-    post.content = final_content
+    post.content = improved_section
 
     # Set the post status as 'draft'
     post.post_status = 'draft'
