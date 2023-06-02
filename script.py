@@ -579,7 +579,7 @@ def generate_article(topic, model="gpt-3.5-turbo", max_tokens_outline=500, max_t
 
 
     status.text('Finished')
-    final_content = improved_sections
+    final_content = '\n'.join(improved_sections)
 #     html = markdown.markdown(final_content)
 #     plain_text = html2text.html2text(html)
     # Set the display option to show the complete text of a column
@@ -590,7 +590,7 @@ def generate_article(topic, model="gpt-3.5-turbo", max_tokens_outline=500, max_t
     refrencess = markdownify(results.at[0, 'Final_Reference_Output'])
     final_content = final_content + '\n' + "References" + '\n' + str(refrencess)
     #st.markdown(final_content,unsafe_allow_html=True)
-    file_name = f"{query}_final_articlee.docx"
+    file_name = f"{query}_final_articlee.rtf"
     link_text = "Click here to download complete article"
     st.markdown(create_download_link(final_content, file_name, link_text), unsafe_allow_html=True)
 
@@ -599,17 +599,16 @@ from io import BytesIO
 import base64
 from docx.shared import Pt
 
+from io import BytesIO
+import base64
+from docx import Document
+
 def create_download_link(string, file_name, link_text):
-    # Create a new Word document
+    # Create a new RTF document
     doc = Document()
     
-    # Set font size for the content
-    content_paragraph = doc.add_paragraph()
-    content_run = content_paragraph.add_run()
-    content_run.font.size = Pt(12)
-    
     # Add the string content to the document
-    content_run.text = string
+    doc.add_paragraph(string)
     
     # Save the document to a BytesIO object
     doc_io = BytesIO()
@@ -620,7 +619,7 @@ def create_download_link(string, file_name, link_text):
     doc_base64 = base64.b64encode(doc_io.read()).decode()
     
     # Create the download link
-    href = f'<a href="data:application/vnd.openxmlformats-officedocument.wordprocessingml.document;base64,{doc_base64}" download="{file_name}">{link_text}</a>'
+    href = f'<a href="data:text/rtf;base64,{doc_base64}" download="{file_name}">{link_text}</a>'
     
     return href
 
