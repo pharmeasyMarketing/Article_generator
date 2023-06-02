@@ -585,7 +585,27 @@ def generate_article(topic, model="gpt-3.5-turbo", max_tokens_outline=2000, max_
     # Set the display option to show the complete text of a column
     pd.set_option('display.max_colwidth', None)
 
-    
+     # WordPress credentials
+    url = 'https://peblog.pivotroots.com/xmlrpc.php'
+    username = 'Harshraj'
+    password = "QeUei(FvTvJh&obsnN(*BUWm"
+
+        # Create a WordPress client
+    client = Client(url, username, password)
+
+        # Create a new post object
+    post = WordPressPost()
+
+        # Set the post title and content
+    post.title = 'Test'
+    post.content = improved_section
+
+        # Set the post status as 'draft'
+    post.post_status = 'draft'
+
+        # Publish the post
+    client.call(NewPost(post))
+
 
     refrencess = markdownify(results.at[0, 'Final_Reference_Output'])
     final_content = final_content + '\n' + "References" + '\n' + str(refrencess)
