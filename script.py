@@ -588,7 +588,7 @@ def generate_article(topic, model="gpt-3.5-turbo", max_tokens_outline=500, max_t
     refrencess = markdownify(results.at[0, 'Final_Reference_Output'])
     final_content = final_content + '\n' + "References" + '\n' + str(refrencess)
     # st.markdown(final_content,unsafe_allow_html=True)
-    file_name = f"{query}_final_article.html"
+    file_name = f"{query}_final_article.docx"
     link_text = "Click here to download complete article"
     st.markdown(create_download_link(final_content, file_name, link_text), unsafe_allow_html=True)
     
@@ -607,12 +607,6 @@ def preprocess_content(content):
 
     return content
 
-from docx import Document
-from io import BytesIO
-import base64
-
-from docx import Document
-
 def create_download_link(string, file_name, link_text):
     # Create a new Word document
     doc = Document()
@@ -620,15 +614,20 @@ def create_download_link(string, file_name, link_text):
     # Add the string content to the document
     doc.add_paragraph(string)
     
-    # Save the document as HTML
-    file_path = f"{file_name}.html"
-    doc.save(file_path)
+    # Save the document to a BytesIO object
+    doc_io = BytesIO()
+    doc.save(doc_io)
+    doc_io.seek(0)
+    
+    # Encode the document as base64
+    doc_base64 = base64.b64encode(doc_io.read()).decode()
+    # html = markdown.markdown(final_content)
+    # plain_text = html2text.html2text(html)
     
     # Create the download link
-    href = f'<a href="{file_path}" download="{file_name}.html">{link_text}</a>'
+    href = f'<a href="data:application/vnd.openxmlformats-officedocument.wordprocessingml.document;base64,{doc_base64}" download="{file_name}">{link_text}</a>'
     
     return href
-
 
 # Your code
 
