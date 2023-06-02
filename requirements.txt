@@ -8,3 +8,5 @@ apify-client
 transformers
 python-docx
 markdownify
+docxtpl
+DocxTemplate
