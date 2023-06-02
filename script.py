@@ -570,7 +570,7 @@ def generate_article(topic, model="gpt-3.5-turbo", max_tokens_outline=500, max_t
     status.text('Improving sections...')
     
   improved_sections = []
-for i, section in enumerate(sections):
+  for i, section in enumerate(sections):
     section_string = '\n'.join(section)
     status.text(f'Improving section {i+1} of {len(sections)}...')
     time.sleep(5)
