@@ -8,4 +8,4 @@ apify-client
 transformers
 python-docx
 markdownify
-
+docxtpl==0.11.2
