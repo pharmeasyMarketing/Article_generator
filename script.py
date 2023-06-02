@@ -29,9 +29,7 @@ import base64
 from io import BytesIO
 # import markdown
 # import html2text
-from markdownify import markdownify 
-from wordpress_xmlrpc import Client, WordPressPost
-from wordpress_xmlrpc.methods.posts import NewPost
+from markdownify import markdownify
 
 #openai.api_key = openai.api_key = os.environ['openai_api_key']
 tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
@@ -365,8 +363,8 @@ def summarize_nlp(df):
 
 
 @st.cache_data(show_spinner=False)
-def generate_content(prompt, model="gpt-3.5-turbo", max_tokens=500, temperature=0.4):
-    prompt = truncate_to_token_length(prompt,500)
+def generate_content(prompt, model="gpt-3.5-turbo", max_tokens=1000, temperature=0.4):
+    prompt = truncate_to_token_length(prompt,2500)
     #st.write(prompt)
     #for i in range(3):
         #try:
@@ -392,8 +390,8 @@ def generate_content(prompt, model="gpt-3.5-turbo", max_tokens=500, temperature=
     #return None
 
 @st.cache_data(show_spinner=False)
-def generate_content2(prompt, model="gpt-3.5-turbo", max_tokens=500, temperature=0.4):
-    prompt = truncate_to_token_length(prompt,500)
+def generate_content2(prompt, model="gpt-3.5-turbo", max_tokens=1000, temperature=0.4):
+    prompt = truncate_to_token_length(prompt,2500)
     #st.write(prompt)
     #for i in range(3):
         #try:
@@ -420,8 +418,8 @@ def generate_content2(prompt, model="gpt-3.5-turbo", max_tokens=500, temperature
 
     
 @st.cache_data(show_spinner=False)
-def generate_content3(prompt, model="gpt-3.5-turbo", max_tokens=500, temperature=0.4):
-    prompt = truncate_to_token_length(prompt,500)
+def generate_content3(prompt, model="gpt-3.5-turbo", max_tokens=1000, temperature=0.4):
+    prompt = truncate_to_token_length(prompt,2500)
     #st.write(prompt)
     #for i in range(3):
         #try:
@@ -442,8 +440,8 @@ def generate_content3(prompt, model="gpt-3.5-turbo", max_tokens=500, temperature
     
     
 @st.cache_data(show_spinner=False)
-def generate_semantic_improvements_guide(prompt,query, model="gpt-3.5-turbo", max_tokens=500, temperature=0.4):
-    prompt = truncate_to_token_length(prompt,500)
+def generate_semantic_improvements_guide(prompt,query, model="gpt-3.5-turbo", max_tokens=2000, temperature=0.4):
+    prompt = truncate_to_token_length(prompt,1500)
     #for i in range(3):
         #try:
     gpt_response = openai.ChatCompletion.create(
@@ -473,14 +471,14 @@ def generate_semantic_improvements_guide(prompt,query, model="gpt-3.5-turbo", ma
    
 
 @st.cache_data(show_spinner=False)
-def generate_outline(topic, model="gpt-3.5-turbo", max_tokens=500):
+def generate_outline(topic, model="gpt-3.5-turbo", max_tokens=1500):
     prompt = f"Generate an incredibly thorough article outline for the topic: {topic}. Consider all possible angles and be as thorough as possible. Please use Roman Numerals for each section."
     outline = generate_content(prompt, model=model, max_tokens=max_tokens)
     #save_to_file("outline.txt", outline)
     return outline
 
 @st.cache_data(show_spinner=False)
-def improve_outline(outline, semantic_readout, model="gpt-3.5-turbo", max_tokens=500):
+def improve_outline(outline, semantic_readout, model="gpt-3.5-turbo", max_tokens=1500):
     prompt = f"Given the following article outline, please improve and extend this outline significantly as much as you can keeping in mind the SEO keywords and data being provided in our semantic seo readout. Do not include a section about semantic SEO itself, you are using the readout to better inform your creation of the outline. Try and include and extend this as much as you can. Please use Roman Numerals for each section. The goal is as thorough, clear, and useful out line as possible exploring the topic in as much depth as possible. Think step by step before answering. Please take into consideration the semantic seo readout provided here: {semantic_readout} which should help inform some of the improvements you can make, though please also consider additional improvements not included in this semantic seo readout.  Outline to improve: {outline}."
     improved_outline = generate_content(prompt, model=model, max_tokens=max_tokens)
     #save_to_file("improved_outline.txt", improved_outline)
@@ -489,7 +487,7 @@ def improve_outline(outline, semantic_readout, model="gpt-3.5-turbo", max_tokens
 
 
 @st.cache_data(show_spinner=False)
-def generate_sections(improved_outline, model="gpt-3.5-turbo", max_tokens=500):
+def generate_sections(improved_outline, model="gpt-3.5-turbo", max_tokens=2000):
     sections = []
 
     # Parse the outline to identify the major sections
@@ -517,7 +515,7 @@ def generate_sections(improved_outline, model="gpt-3.5-turbo", max_tokens=500):
     return sections
 
 @st.cache_data(show_spinner=False)
-def improve_section(section, i, model="gpt-3.5-turbo", max_tokens=500):
+def improve_section(section, i, model="gpt-3.5-turbo", max_tokens=1500):
     prompt = f"Given the following section of the article: {section}, please make thorough and improvements to this section. Keep whatever hierarchy you find. Only provide the updated section, not the text of your recommendation, just make the changes. Always provide the updated section in valid Markdown please. Updated Section with improvements:"
     prompt = str(prompt)
     improved_section = generate_content2(prompt, model=model, max_tokens=max_tokens)
@@ -547,7 +545,7 @@ def concatenate_files(file_names, output_file_name):
 
 
 @st.cache_data(show_spinner=False)
-def generate_article(topic, model="gpt-3.5-turbo", max_tokens_outline=500, max_tokens_section=500, max_tokens_improve_section=500):
+def generate_article(topic, model="gpt-3.5-turbo", max_tokens_outline=2000, max_tokens_section=2000, max_tokens_improve_section=4000):
     status = st.empty()
     status.text('Analyzing SERPs...')
     
@@ -563,7 +561,7 @@ def generate_article(topic, model="gpt-3.5-turbo", max_tokens_outline=500, max_t
     initial_outline = generate_outline(topic, model=model, max_tokens=max_tokens_outline)
 
     status.text('Improving the initial outline...')
-    improved_outline = improve_outline(initial_outline, semantic_readout, model=model, max_tokens=500)
+    improved_outline = improve_outline(initial_outline, semantic_readout, model=model, max_tokens=1500)
     #st.markdown(improved_outline,unsafe_allow_html=True)
     
     status.text('Generating sections based on the improved outline...')
@@ -576,41 +574,30 @@ def generate_article(topic, model="gpt-3.5-turbo", max_tokens_outline=500, max_t
         section_string = '\n'.join(section)
         status.text(f'Improving section {i+1} of {len(sections)}...')
         time.sleep(5)
-        improved_section = improve_section(section_string, i, model=model, max_tokens=500)
-#         final_reference_output = markdownify(results.at[0, 'Final_Reference_Output'])
-#         improved_sections.append((improved_section, final_reference_output))
-        return(improved_sections)
-  
+        improved_sections.append(improve_section(section_string, i, model=model, max_tokens=1200))
+
+
+
     status.text('Finished')
     final_content = '\n'.join(improved_sections)
-    # html = markdown.markdown(final_content)
-    # plain_text = html2text.html2text(html)
+#     html = markdown.markdown(final_content)
+#     plain_text = html2text.html2text(html)
     # Set the display option to show the complete text of a column
     pd.set_option('display.max_colwidth', None)
 
-    refrencess = results.at[0, 'Final_Reference_Output']
+    
+
+    refrencess = markdownify(results.at[0, 'Final_Reference_Output'])
     final_content = final_content + '\n' + "References" + '\n' + str(refrencess)
-    # st.markdown(final_content,unsafe_allow_html=True)
+    #st.markdown(final_content,unsafe_allow_html=True)
     file_name = f"{query}_final_article.docx"
     link_text = "Click here to download complete article"
     st.markdown(create_download_link(final_content, file_name, link_text), unsafe_allow_html=True)
+    st.markdown(final_content)
+
+
+
    
-      
-from io import BytesIO
-import base64
-from docx import Document
-import pypandoc
-import re
-
-def preprocess_content(content):
-    # Remove Markdown-specific syntax or formatting
-    # Adjust the regular expressions as needed for your specific requirements
-    content = re.sub(r'\*\*(.*?)\*\*', r'\1', content)  # Remove bold formatting
-    content = re.sub(r'_(.*?)_', r'\1', content)  # Remove italic formatting
-    # Add more preprocessing steps if necessary
-
-    return content
-
 def create_download_link(string, file_name, link_text):
     # Create a new Word document
     doc = Document()
@@ -632,9 +619,6 @@ def create_download_link(string, file_name, link_text):
     href = f'<a href="data:application/vnd.openxmlformats-officedocument.wordprocessingml.document;base64,{doc_base64}" download="{file_name}">{link_text}</a>'
     
     return href
-
-# Your code
-
 
 
 
