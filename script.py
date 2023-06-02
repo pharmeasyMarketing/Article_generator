@@ -575,9 +575,8 @@ def generate_article(topic, model="gpt-3.5-turbo", max_tokens_outline=500, max_t
         status.text(f'Improving section {i+1} of {len(sections)}...')
         time.sleep(5)
         improved_sections.append(improve_section(section_string, i, model=model, max_tokens=500))
-        results.at[0, 'Final_Reference_Output']
 
-
+    improved_sections.append(results.at[0, 'Final_Reference_Output'])
 
 
     status.text('Finished')
