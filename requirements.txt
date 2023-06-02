@@ -9,3 +9,4 @@ transformers
 python-docx
 markdownify
 pypandoc
+python-wordpress-xmlrpc
