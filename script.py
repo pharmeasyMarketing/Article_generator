@@ -601,17 +601,24 @@ from docxtpl import DocxTemplate
 import base64
 from io import BytesIO
 
+from docx import Document
+from io import BytesIO
+import base64
+from docx.shared import Pt
+
 def create_download_link(string, file_name, link_text):
-    # Load the Word document template
-    doc = DocxTemplate('template.docx')  # Replace 'template.docx' with the path to your own Word template
+    # Create a new Word document
+    doc = Document()
     
-    # Create a context dictionary to fill in the template
-    context = {'content': string}
+    # Set font size for the content
+    content_paragraph = doc.add_paragraph()
+    content_run = content_paragraph.add_run()
+    content_run.font.size = Pt(12)
     
-    # Render the template with the context
-    doc.render(context)
+    # Add the string content to the document
+    content_run.text = string
     
-    # Save the rendered document to a BytesIO object
+    # Save the document to a BytesIO object
     doc_io = BytesIO()
     doc.save(doc_io)
     doc_io.seek(0)
@@ -623,6 +630,7 @@ def create_download_link(string, file_name, link_text):
     href = f'<a href="data:application/vnd.openxmlformats-officedocument.wordprocessingml.document;base64,{doc_base64}" download="{file_name}">{link_text}</a>'
     
     return href
+
 
 
 
