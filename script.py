@@ -580,48 +580,46 @@ def generate_article(topic, model="gpt-3.5-turbo", max_tokens_outline=500, max_t
 
     status.text('Finished')
     final_content = '\n'.join(improved_sections)
-#     html = markdown.markdown(final_content)
-#     plain_text = html2text.html2text(html)
+    # html = markdown.markdown(final_content)
+    # plain_text = html2text.html2text(html)
     # Set the display option to show the complete text of a column
     pd.set_option('display.max_colwidth', None)
 
-    
-
     refrencess = markdownify(results.at[0, 'Final_Reference_Output'])
     final_content = final_content + '\n' + "References" + '\n' + str(refrencess)
-    #st.markdown(final_content,unsafe_allow_html=True)
-    file_name = f"{query}_final_articlee.rtf"
+    # st.markdown(final_content,unsafe_allow_html=True)
+    file_name = f"{query}_final_article.docx"
     link_text = "Click here to download complete article"
     st.markdown(create_download_link(final_content, file_name, link_text), unsafe_allow_html=True)
-
-from docx import Document
-from io import BytesIO
-import base64
-from docx.shared import Pt
-
+    
 from io import BytesIO
 import base64
 from docx import Document
+import pypandoc
+import re
+
+def preprocess_content(content):
+    # Remove Markdown-specific syntax or formatting
+    # Adjust the regular expressions as needed for your specific requirements
+    content = re.sub(r'\*\*(.*?)\*\*', r'\1', content)  # Remove bold formatting
+    content = re.sub(r'_(.*?)_', r'\1', content)  # Remove italic formatting
+    # Add more preprocessing steps if necessary
+
+    return content
 
 def create_download_link(string, file_name, link_text):
-    # Create a new RTF document
-    doc = Document()
-    
-    # Add the string content to the document
-    doc.add_paragraph(string)
-    
-    # Save the document to a BytesIO object
-    doc_io = BytesIO()
-    doc.save(doc_io)
-    doc_io.seek(0)
-    
-    # Encode the document as base64
-    doc_base64 = base64.b64encode(doc_io.read()).decode()
-    
+    # Preprocess the content
+    string = preprocess_content(string)
+
+    # Convert Markdown to DOCX using pypandoc
+    docx_content = pypandoc.convert_text(string, 'docx', format='md')
+
     # Create the download link
-    href = f'<a href="data:text/rtf;base64,{doc_base64}" download="{file_name}">{link_text}</a>'
+    href = f'<a href="data:application/vnd.openxmlformats-officedocument.wordprocessingml.document;base64,{base64.b64encode(docx_content).decode()}" download="{file_name}">{link_text}</a>'
     
     return href
+
+# Your code
 
 
 
