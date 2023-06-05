@@ -544,8 +544,9 @@ def wp_post():
     password = "QeUei(FvTvJh&obsnN(*BUWm"
     title = "testing"
     content ="contnet"
-    client = Client(url, username, password)
     
+    client = Client(url, username, password)
+  
 
     # Create a new post object
     post = WordPressPost()
