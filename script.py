@@ -577,24 +577,23 @@ def generate_article(topic, model="gpt-3.5-turbo", max_tokens_outline=2000, max_
 
     status.text('Finished')
     final_content = '\n'.join(improved_sections)
-#     html = markdown.markdown(final_content)
-#     plain_text = html2text.html2text(html)
+    html = markdown.markdown(final_content)
+    # plain_text = html_to_text(html)
     # Set the display option to show the complete text of a column
     pd.set_option('display.max_colwidth', None)
-    
 
-    refrencess = markdownify(results.at[0, 'Final_Reference_Output'])
-    final_content = final_content + '\n' + "References" + '\n' + str(refrencess)
+    refrencess = results.at[0, 'Final_Reference_Output']
+    html = html   + "<h2>References</h2>"  + refrencess
+    doc_save_content = final_content + '\n' + '\n' + "References" + '\n' + '\n' + markdownify(refrencess)
+    
     #st.markdown(final_content,unsafe_allow_html=True)
     file_name = f"{query}_final_article.docx"
     link_text = "Click here to download complete article"
-    st.markdown(create_download_link(final_content, file_name, link_text), unsafe_allow_html=True)
-#     st.markdown(final_content)
-    return final_content
-#     content = final_content
+    st.markdown(create_download_link(doc_save_content, file_name, link_text), unsafe_allow_html=True)
+    # st.markdown(final_content)
+    # wp_post(html, query)
 
-# Call the generate_article() function with input values
-
+    # return html
 def wp_post(final_draft, Blog_URL, Username, Password, topic):
     # Create a WordPress client
     url = Blog_URL + '/xmlrpc.php'
