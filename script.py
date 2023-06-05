@@ -490,7 +490,7 @@ def improve_outline(outline, semantic_readout, model="gpt-3.5-turbo", max_tokens
 
 
 @st.cache_data(show_spinner=False)
-def generate_sections(improved_outline, model="gpt-3.5-turbo", max_tokens=2000):
+def generate_sections(improved_outline, model="gpt-3.5-turbo", max_tokens=word_count):
     sections = []
 
     # Parse the outline to identify the major sections
@@ -543,7 +543,7 @@ def concatenate_files(file_names, output_file_name):
 
 
 @st.cache_data(show_spinner=False, experimental_allow_widgets=True) 
-def generate_article(topic, model="gpt-3.5-turbo", max_tokens_outline=2000, max_tokens_section=2000, max_tokens_improve_section=4000):
+def generate_article(topic, model="gpt-3.5-turbo", word_count, max_tokens_outline=2000, max_tokens_section=2000, max_tokens_improve_section=4000):
     status = st.empty()
     status.text('Analyzing SERPs...')
     
@@ -556,14 +556,14 @@ def generate_article(topic, model="gpt-3.5-turbo", max_tokens_outline=2000, max_
     
     
     status.text('Generating initial outline...')
-    initial_outline = generate_outline(topic, model=model, max_tokens=max_tokens_outline)
+    initial_outline = generate_outline(topic, model=model, max_tokens=word_count)
 
     status.text('Improving the initial outline...')
-    improved_outline = improve_outline(initial_outline, semantic_readout, model=model, max_tokens=1500)
+    improved_outline = improve_outline(initial_outline, semantic_readout, model=model, max_tokens=word_count)
     #st.markdown(improved_outline,unsafe_allow_html=True)
     
     status.text('Generating sections based on the improved outline...')
-    sections = generate_sections(improved_outline, model=model, max_tokens=max_tokens_section)
+    sections = generate_sections(improved_outline, model=model, max_tokens=word_count)
 
     status.text('Improving sections...')
     
@@ -572,7 +572,7 @@ def generate_article(topic, model="gpt-3.5-turbo", max_tokens_outline=2000, max_
         section_string = '\n'.join(section)
         status.text(f'Improving section {i+1} of {len(sections)}...')
         time.sleep(5)
-        improved_sections.append(improve_section(section_string, i, model=model, max_tokens=1200))
+        improved_sections.append(improve_section(section_string, i, model=model, max_tokens=word_count))
 
 
 
@@ -670,7 +670,8 @@ def main():
 
     # Get user input for API key
     user_api_key = st.text_input("Enter your OpenAI API key")
-
+    word_count = st.number_input("Enter Word Count", step=1, value=0)
+    
     if st.button('Generate Content'):
         if user_api_key:
             openai.api_key = user_api_key
