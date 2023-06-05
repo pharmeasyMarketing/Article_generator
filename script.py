@@ -605,17 +605,18 @@ def generate_article(topic, model="gpt-3.5-turbo", max_tokens_outline=2000, max_
     link_text = "Click here to download complete article"
     st.markdown(create_download_link(final_content, file_name, link_text), unsafe_allow_html=True)
     st.markdown(final_content)
-    content = final_content
-    url = 'https://peblog.pivotroots.com/xmlrpc.php'
-    username = 'Harshraj'
-    password = "QeUei(FvTvJh&obsnN(*BUWm"
-    title = "testing"
-    if st.button("Publish to WordPress"):
-    # Call the wp_post() function with retrieved values
-        wp_post(url, username, password, title, content)
+    return final_content
+#     content = final_content
 
 # Call the generate_article() function with input values
 
+url = 'https://peblog.pivotroots.com/xmlrpc.php'
+username = 'Harshraj'
+password = "QeUei(FvTvJh&obsnN(*BUWm"
+title = "testing"
+if st.button("Publish to WordPress"):
+# Call the wp_post() function with retrieved values
+    wp_post(url, username, password, title, generate_article(topic, model="gpt-3.5-turbo", max_tokens_outline=2000, max_tokens_section=2000, max_tokens_improve_section=4000))
 
    
 def create_download_link(string, file_name, link_text):
