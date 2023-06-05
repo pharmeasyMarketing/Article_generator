@@ -670,7 +670,9 @@ def main():
 
     # Get user input for API key
     user_api_key = st.text_input("Enter your OpenAI API key")
-    word_count = st.number_input("Enter Word Count")
+    word_count = st.number_input("Enter your OpenAI API key", step=1, format='%.0f', value=0)
+
+# Now 'word_count' will be an integer without any decimal points
     
     if st.button('Generate Content'):
         if user_api_key:
