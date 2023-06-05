@@ -581,7 +581,6 @@ def generate_article(topic, model="gpt-3.5-turbo", max_tokens_outline=2000, max_
 #     plain_text = html2text.html2text(html)
     # Set the display option to show the complete text of a column
     pd.set_option('display.max_colwidth', None)
-
     
 
     refrencess = markdownify(results.at[0, 'Final_Reference_Output'])
@@ -596,22 +595,18 @@ def generate_article(topic, model="gpt-3.5-turbo", max_tokens_outline=2000, max_
 
 # Call the generate_article() function with input values
 
-def wp_post(final_draft):
+def wp_post(final_draft, Blog_URL, Username, Password, topic):
     # Create a WordPress client
-    url = 'https://peblog.pivotroots.com/xmlrpc.php'
-    username = 'Harshraj'
-    password = "QeUei(FvTvJh&obsnN(*BUWm"
-    title = "testing 2"
+    url = Blog_URL + '/xmlrpc.php'
     content = final_draft
-    
-    client = Client(url, username, password)
+   
+    client = Client(url, Username, Password)
   
-
     # Create a new post object
     post = WordPressPost()
 
     # Set the post title and content
-    post.title = title
+    post.title = topic
     post.content = content
 
     # Set the post status as 'draft'
@@ -683,12 +678,17 @@ def main():
                 # st.markdown(final_draft)
         else:
             st.warning("Please enter your OpenAI API key above.")
-    user_input = st.text_input("Publish to WordPress? (Type 'yes' or 'no')")
-                
-    if st.button("Submit") and user_input.lower() == "yes":
-        final_draft = generate_article(topic)
+            
+    st.header("Publish to Wordpress")
+    Blog_URL = st.text_input("Write Your Blog URL WITHOUT SPACE")
+    Username = st.text_input("Username")
+    Password = st.text_input("Password")
+    final_draft = generate_article(topic)
+    
+    if st.button("Publish Now"):
+
         # Call the wp_post() function with the final_draft variable
-        wp_post(final_draft)
+        wp_post(final_draft, Blog URL, Username, Password, topic)
     # Access the final_draft value here
 
 
