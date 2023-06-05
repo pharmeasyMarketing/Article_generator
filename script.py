@@ -589,9 +589,36 @@ def generate_article(topic, model="gpt-3.5-turbo", max_tokens_outline=2000, max_
     link_text = "Click here to download complete article"
     st.markdown(create_download_link(final_content, file_name, link_text), unsafe_allow_html=True)
     st.markdown(final_content)
+    url = st.text_input("WordPress URL")
+    username = st.text_input("Username")
+    password = st.text_input("Password", type="password")
+
+    # Set the title and content
+    title = topic
+    content = final_content
+
+    # Create a button
+    if st.button("Publish to WordPress"):
+        # Call the wp_post() function with retrieved values
+        wp_post(url, username, password, title, content)
 
 
+def wp_post(url, username, password, title, content):
+    # Create a WordPress client
+    client = Client(url, username, password)
 
+    # Create a new post object
+    post = WordPressPost()
+
+    # Set the post title and content
+    post.title = title
+    post.content = content
+
+    # Set the post status as 'draft'
+    post.post_status = 'draft'
+
+    # Publish the post
+    client.call(NewPost(post))
    
 def create_download_link(string, file_name, link_text):
     # Create a new Word document
