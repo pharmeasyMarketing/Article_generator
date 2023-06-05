@@ -680,6 +680,7 @@ def main():
             openai.api_key = user_api_key
             with st.spinner("Generating content..."):
                 final_draft = generate_article(topic)
+                user_input = st.text_input("Publish to WordPress? (Type 'yes' or 'no')")
                 if st.button("Submit") and user_input.lower() == "yes":
         # Call the wp_post() function with the final_draft variable
                     wp_post(final_draft)
