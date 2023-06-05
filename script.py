@@ -556,10 +556,10 @@ def generate_article(topic,word_count, model="gpt-3.5-turbo", max_tokens_outline
     
     
     status.text('Generating initial outline...')
-    initial_outline = generate_outline(topic, model=model, max_tokens=word_count)
+    initial_outline = generate_outline(topic, model=model, max_tokens=500)
 
     status.text('Improving the initial outline...')
-    improved_outline = improve_outline(initial_outline, semantic_readout, model=model, max_tokens=word_count)
+    improved_outline = improve_outline(initial_outline, semantic_readout, model=model, max_tokens=500)
     #st.markdown(improved_outline,unsafe_allow_html=True)
     
     status.text('Generating sections based on the improved outline...')
