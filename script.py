@@ -502,7 +502,7 @@ def generate_sections(improved_outline, model="gpt-3.5-turbo", max_tokens=2000):
                 major_sections.append('\n'.join(current_section))
                 current_section = []
         current_section.append(part)
-    if current_section:  # Append the last section
+        if current_section:  # Append the last section
         major_sections.append('\n'.join(current_section))
 
     # Generate content for each major section
