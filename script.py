@@ -614,9 +614,9 @@ password = "QeUei(FvTvJh&obsnN(*BUWm"
 title = "testing"
 # Call the generate_article() function with input values
 
-if st.button("Publish to WordPress"):
-    # Call the wp_post() function with retrieved values
-    wp_post(url, username, password, title, generate_article(topic))
+# if st.button("Publish to WordPress"):
+#     # Call the wp_post() function with retrieved values
+#     wp_post(url, username, password, title, generate_article(topic))
    
 def create_download_link(string, file_name, link_text):
     # Create a new Word document
