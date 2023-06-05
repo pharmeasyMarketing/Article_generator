@@ -536,23 +536,23 @@ def concatenate_files(file_names, output_file_name):
 
     #print("Final draft created.\n")
     return final_draft
-@st.cache_data(show_spinner=False)
-def wp_post(url, username, password, title, content):
-    # Create a WordPress client
-    client = Client(url, username, password)
+# @st.cache_data(show_spinner=False)
+# def wp_post(url, username, password, title, content):
+#     # Create a WordPress client
+#     client = Client(url, username, password)
 
-    # Create a new post object
-    post = WordPressPost()
+#     # Create a new post object
+#     post = WordPressPost()
 
-    # Set the post title and content
-    post.title = title
-    post.content = content
+#     # Set the post title and content
+#     post.title = title
+#     post.content = content
 
-    # Set the post status as 'draft'
-    post.post_status = 'draft'
+#     # Set the post status as 'draft'
+#     post.post_status = 'draft'
 
-    # Publish the post
-    client.call(NewPost(post))
+#     # Publish the post
+#     client.call(NewPost(post))
 
 
 @st.cache_data(show_spinner=False)
