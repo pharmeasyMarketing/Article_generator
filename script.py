@@ -555,7 +555,7 @@ def wp_post(url, username, password, title, content):
     client.call(NewPost(post))
 
 
-@st.cache_data(show_spinner=False)
+@st.cache_data(show_spinner=False, experimental_allow_widgets=True) 
 def generate_article(topic, model="gpt-3.5-turbo", max_tokens_outline=2000, max_tokens_section=2000, max_tokens_improve_section=4000):
     status = st.empty()
     status.text('Analyzing SERPs...')
