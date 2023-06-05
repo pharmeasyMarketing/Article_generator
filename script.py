@@ -22,17 +22,14 @@ import streamlit as st
 # from apify_client import ApifyClient
 import pandas as pd
 import transformers
-from wordpress_xmlrpc import Client, WordPressPost
-from wordpress_xmlrpc.methods.posts import NewPost
 from transformers import GPT2Tokenizer
 from docx import Document
 import json
 import base64
 from io import BytesIO
-import markdown
+# import markdown
 # import html2text
 from markdownify import markdownify
-from html.parser import HTMLParser
 
 #openai.api_key = openai.api_key = os.environ['openai_api_key']
 tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
@@ -443,15 +440,15 @@ def generate_content3(prompt, model="gpt-3.5-turbo", max_tokens=1000, temperatur
     
     
 @st.cache_data(show_spinner=False)
-def generate_semantic_improvements_guide(prompt, word_count, query, model="gpt-3.5-turbo", max_tokens=2000, temperature=0.4):
+def generate_semantic_improvements_guide(prompt,query, model="gpt-3.5-turbo", max_tokens=2000, temperature=0.4):
     prompt = truncate_to_token_length(prompt,1500)
     #for i in range(3):
         #try:
     gpt_response = openai.ChatCompletion.create(
         model=model,
         messages=[
-            {"role": "system", "content": f"""You are an expert at Semantic SEO. In particular, you are superhuman at taking  a given NLTK report on a given text corpus compiled from the text of the linked pages returned for a google search.
-            and using it to build a comprehensive set of instructions for an article writer that can be used to inform someone writing a long-form article about a given topic under {word_count} words  so that they can best fully cover the semantic SEO as shown in NLTK data from the SERP corpus. 
+            {"role": "system", "content": """You are an expert at Semantic SEO. In particular, you are superhuman at taking  a given NLTK report on a given text corpus compiled from the text of the linked pages returned for a google search.
+            and using it to build a comprehensive set of instructions for an article writer that can be used to inform someone writing a long-form article about a given topic so that they can best fully cover the semantic SEO as shown in NLTK data from the SERP corpus. 
              Provide the result in well formatted markdown. The goal of this guide is to help the writer make sure that the content they are creating is as comprehensive to the semantic SEO with a focus on what is most imprtant from a semantic SEO perspective."""},
             {"role": "user", "content": f"Semantic SEO data for the keyword based on the content that ranks on the first page of google for the given keyword query of: {query} and it's related semantic data:  {prompt}"}],
         max_tokens=max_tokens,
@@ -497,7 +494,7 @@ def generate_sections(improved_outline, model="gpt-3.5-turbo", max_tokens=2000):
     major_sections = []
     current_section = []
     for part in improved_outline:
-        if re.match(r'^[ \t][#][ \t]*(I|II|III|IV|V|VI|VII|VIII|IX|X|XI|XII|XIII|XIV|XV)\b', part):
+        if re.match(r'^[ \t]*[#]*[ \t]*(I|II|III|IV|V|VI|VII|VIII|IX|X|XI|XII|XIII|XIV|XV)\b', part):
             if current_section:  # not the first section
                 major_sections.append('\n'.join(current_section))
                 current_section = []
@@ -511,11 +508,12 @@ def generate_sections(improved_outline, model="gpt-3.5-turbo", max_tokens=2000):
         full_outline += '\n'.join(improved_outline)
         specific_section = ", and focusing specifically on the following section: "
         specific_section += section_outline
-        prompt =  specific_section + ", please write a thorough section that goes in-depth, provides detail and evidence. Keep whatever hierarchy you find. Never write a conclusion part of a section unless the section itself is supposed to be a conclusion. Section text:"
+        prompt =  specific_section + ", please write a thorough section that goes in-depth, provides detail and evidence, and adds as much additional value as possible. Keep whatever hierarchy you find. Never write a conclusion part of a section unless the section itself is supposed to be a conclusion. Section text:"
         section = generate_content(prompt, model=model, max_tokens=max_tokens)
         sections.append(section)
         #save_to_file(f"section_{i+1}.txt", section)
     return sections
+
 @st.cache_data(show_spinner=False)
 def improve_section(section, i, model="gpt-3.5-turbo", max_tokens=1500):
     prompt = f"Given the following section of the article: {section}, please make thorough and improvements to this section. Keep whatever hierarchy you find. Only provide the updated section, not the text of your recommendation, just make the changes. Always provide the updated section in valid Markdown please. Updated Section with improvements:"
@@ -524,11 +522,6 @@ def improve_section(section, i, model="gpt-3.5-turbo", max_tokens=1500):
     #st.markdown(improved_section)
     st.markdown(improved_section,unsafe_allow_html=True)
     return "".join(improved_section)  # join the lines into a single string
-
-
-
-
-
 
 @st.cache_data(show_spinner=False)
 def concatenate_files(file_names, output_file_name):
@@ -556,7 +549,7 @@ def generate_article(topic, model="gpt-3.5-turbo", max_tokens_outline=2000, max_
     summary = summarize_nlp(results)
 
     status.text('Generating semantic SEO readout...')
-    semantic_readout = generate_semantic_improvements_guide(topic, summary, query, model=model, max_tokens=max_tokens_outline)
+    semantic_readout = generate_semantic_improvements_guide(topic, summary,  model=model, max_tokens=max_tokens_outline)
     
     
     status.text('Generating initial outline...')
@@ -582,64 +575,23 @@ def generate_article(topic, model="gpt-3.5-turbo", max_tokens_outline=2000, max_
 
     status.text('Finished')
     final_content = '\n'.join(improved_sections)
-    html = markdown.markdown(final_content)
-    # plain_text = html_to_text(html)
+#     html = markdown.markdown(final_content)
+#     plain_text = html2text.html2text(html)
     # Set the display option to show the complete text of a column
     pd.set_option('display.max_colwidth', None)
 
-    refrencess = results.at[0, 'Final_Reference_Output']
-    html = html   + "<h2>References</h2>"  + refrencess
-    doc_save_content = final_content + '\n' + '\n' + "References" + '\n' + '\n' + markdownify(refrencess)
     
+
+    refrencess = markdownify(results.at[0, 'Final_Reference_Output'])
+    final_content = final_content + '\n' + "References" + '\n' + str(refrencess)
     #st.markdown(final_content,unsafe_allow_html=True)
     file_name = f"{query}_final_article.docx"
     link_text = "Click here to download complete article"
-    st.markdown(create_download_link(doc_save_content, file_name, link_text), unsafe_allow_html=True)
-    # st.markdown(final_content)
-    # wp_post(html, query)
-
-    # return html
+    st.markdown(create_download_link(final_content, file_name, link_text), unsafe_allow_html=True)
+    st.markdown(final_content)
 
 
 
-def html_to_text(html_text):
-    class MyHTMLParser(HTMLParser):
-        def _init_(self):
-            super()._init_()
-            self.text = ""
-
-        def handle_data(self, data):
-            self.text += data.strip()
-
-    parser = MyHTMLParser()
-    parser.feed(html_text)
-    return parser.text
-
-
-def wp_post(content_to_post, query):
-
-
-# WordPress credentials
-    url = 'https://peblog.pivotroots.com/xmlrpc.php'
-    username = 'Harshraj'
-    password = "QeUei(FvTvJh&obsnN(*BUWm"
-
-
-# Create a WordPress client
-    client = Client(url, username, password)
-
-# Create a new post object
-    post = WordPressPost()
-
-# Set the post title and content
-    post.title = query
-    post.content = content_to_post
-
-# Set the post status as 'draft'
-    post.post_status = 'draft'
-
-# Publish the post
-    client.call(NewPost(post))
    
 def create_download_link(string, file_name, link_text):
     # Create a new Word document
@@ -693,7 +645,6 @@ def main():
 
     # Get user input for API key
     user_api_key = st.text_input("Enter your OpenAI API key")
-#     word_count = st.text_input("Enter Word Count")
 
     if st.button('Generate Content'):
         if user_api_key:
@@ -706,3 +657,8 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+
+
+
