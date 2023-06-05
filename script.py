@@ -602,7 +602,7 @@ def wp_post():
     username = 'Harshraj'
     password = "QeUei(FvTvJh&obsnN(*BUWm"
     title = "testing 2"
-    content = generate_article()
+    content = generate_article(topic)
     
     client = Client(url, username, password)
   
