@@ -536,23 +536,23 @@ def concatenate_files(file_names, output_file_name):
 
     #print("Final draft created.\n")
     return final_draft
-# @st.cache_data(show_spinner=False)
-# def wp_post(url, username, password, title, content):
-#     # Create a WordPress client
-#     client = Client(url, username, password)
 
-#     # Create a new post object
-#     post = WordPressPost()
+def wp_post(url, username, password, title, content):
+    # Create a WordPress client
+    client = Client(url, username, password)
 
-#     # Set the post title and content
-#     post.title = title
-#     post.content = content
+    # Create a new post object
+    post = WordPressPost()
 
-#     # Set the post status as 'draft'
-#     post.post_status = 'draft'
+    # Set the post title and content
+    post.title = title
+    post.content = content
 
-#     # Publish the post
-#     client.call(NewPost(post))
+    # Set the post status as 'draft'
+    post.post_status = 'draft'
+
+    # Publish the post
+    client.call(NewPost(post))
 
 
 @st.cache_data(show_spinner=False)
@@ -606,17 +606,17 @@ def generate_article(topic, model="gpt-3.5-turbo", max_tokens_outline=2000, max_
     st.markdown(create_download_link(final_content, file_name, link_text), unsafe_allow_html=True)
     st.markdown(final_content)
     content = final_content
-    return  content
+    url = 'https://peblog.pivotroots.com/xmlrpc.php'
+    username = 'Harshraj'
+    password = "QeUei(FvTvJh&obsnN(*BUWm"
+    title = "testing"
+    if st.button("Publish to WordPress"):
+    # Call the wp_post() function with retrieved values
+        wp_post(url, username, password, title, generate_article(topic))
 
-url = 'https://peblog.pivotroots.com/xmlrpc.php'
-username = 'Harshraj'
-password = "QeUei(FvTvJh&obsnN(*BUWm"
-title = "testing"
 # Call the generate_article() function with input values
 
-if st.button("Publish to WordPress"):
-    # Call the wp_post() function with retrieved values
-    wp_post(url, username, password, title, generate_article(topic))
+
    
 def create_download_link(string, file_name, link_text):
     # Create a new Word document
