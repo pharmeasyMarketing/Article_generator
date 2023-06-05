@@ -683,11 +683,10 @@ def main():
     Blog_URL = st.text_input("Write Your Blog URL WITHOUT SPACE")
     Username = st.text_input("Username")
     Password = st.text_input("Password")
-    final_draft = generate_article(topic)
     
     if st.button("Publish Now"):
-
         # Call the wp_post() function with the final_draft variable
+        final_draft = generate_article(topic)
         wp_post(final_draft, Blog_URL, Username, Password, topic)
     # Access the final_draft value here
 
