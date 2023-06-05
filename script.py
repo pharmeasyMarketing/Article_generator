@@ -30,6 +30,8 @@ from io import BytesIO
 # import markdown
 # import html2text
 from markdownify import markdownify
+from wordpress_xmlrpc import Client, WordPressPost
+from wordpress_xmlrpc.methods.posts import NewPost
 
 #openai.api_key = openai.api_key = os.environ['openai_api_key']
 tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
