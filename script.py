@@ -589,10 +589,9 @@ def generate_article(topic, model="gpt-3.5-turbo", max_tokens_outline=2000, max_
     link_text = "Click here to download complete article"
     st.markdown(create_download_link(final_content, file_name, link_text), unsafe_allow_html=True)
     st.markdown(final_content)
-    url = st.text_input("WordPress URL")
-    username = st.text_input("Username")
-    password = st.text_input("Password", type="password")
-
+    url = 'https://peblog.pivotroots.com/xmlrpc.php'
+    username = 'Harshraj'
+    password = "QeUei(FvTvJh&obsnN(*BUWm"
     # Set the title and content
     title = topic
     content = final_content
