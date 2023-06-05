@@ -670,7 +670,7 @@ def main():
 
     # Get user input for API key
     user_api_key = st.text_input("Enter your OpenAI API key")
-    word_count = st.number_input("Enter Word Count", step=1, value=0)
+    word_count = st.number_input("Enter Word Count")
     
     if st.button('Generate Content'):
         if user_api_key:
