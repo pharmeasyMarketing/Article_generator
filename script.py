@@ -490,7 +490,7 @@ def improve_outline(outline, semantic_readout, model="gpt-3.5-turbo", max_tokens
 
 
 @st.cache_data(show_spinner=False)
-def generate_sections(improved_outline, word_count, model="gpt-3.5-turbo", max_tokens=1500):
+def generate_sections(improved_outline, model="gpt-3.5-turbo", max_tokens=1500):
     sections = []
 
     # Parse the outline to identify the major sections
