@@ -590,7 +590,7 @@ def generate_article(topic, model="gpt-3.5-turbo", max_tokens_outline=2000, max_
     file_name = f"{query}_final_article.docx"
     link_text = "Click here to download complete article"
     st.markdown(create_download_link(final_content, file_name, link_text), unsafe_allow_html=True)
-    st.markdown(final_content)
+#     st.markdown(final_content)
     return final_content
 #     content = final_content
 
@@ -683,7 +683,7 @@ def main():
                 # st.markdown(final_draft)
         else:
             st.warning("Please enter your OpenAI API key above.")
-                user_input = st.text_input("Publish to WordPress? (Type 'yes' or 'no')")
+    user_input = st.text_input("Publish to WordPress? (Type 'yes' or 'no')")
                 
     if st.button("Submit") and user_input.lower() == "yes":
         final_draft = generate_article(topic)
