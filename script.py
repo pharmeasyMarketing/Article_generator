@@ -543,7 +543,7 @@ def concatenate_files(file_names, output_file_name):
 
 
 @st.cache_data(show_spinner=False, experimental_allow_widgets=True) 
-def generate_article(topic, model="gpt-3.5-turbo", max_tokens_outline=2000, max_tokens_section=2000, max_tokens_improve_section=4000):
+def generate_article(topic,word_count model="gpt-3.5-turbo", max_tokens_outline=2000, max_tokens_section=2000, max_tokens_improve_section=4000):
     status = st.empty()
     status.text('Analyzing SERPs...')
     
@@ -676,7 +676,7 @@ def main():
         if user_api_key:
             openai.api_key = user_api_key
             with st.spinner("Generating content..."):
-                final_draft = generate_article(topic)
+                final_draft = generate_article(topic, word_count)
                 # st.markdown(final_draft)
         else:
             st.warning("Please enter your OpenAI API key above.")
@@ -688,7 +688,7 @@ def main():
     
     if st.button("Publish Now"):
         # Call the wp_post() function with the final_draft variable
-        final_draft = generate_article(topic)
+        final_draft = generate_article(topic, word_count)
         wp_post(final_draft, Blog_URL, Username, Password, topic)
     # Access the final_draft value here
 
