@@ -22,16 +22,17 @@ import streamlit as st
 # from apify_client import ApifyClient
 import pandas as pd
 import transformers
+from wordpress_xmlrpc import Client, WordPressPost
+from wordpress_xmlrpc.methods.posts import NewPost
 from transformers import GPT2Tokenizer
 from docx import Document
 import json
 import base64
 from io import BytesIO
-# import markdown
+import markdown
 # import html2text
 from markdownify import markdownify
-from wordpress_xmlrpc import Client, WordPressPost
-from wordpress_xmlrpc.methods.posts import NewPost
+from html.parser import HTMLParser
 
 #openai.api_key = openai.api_key = os.environ['openai_api_key']
 tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
@@ -442,15 +443,15 @@ def generate_content3(prompt, model="gpt-3.5-turbo", max_tokens=1000, temperatur
     
     
 @st.cache_data(show_spinner=False)
-def generate_semantic_improvements_guide(prompt,query, model="gpt-3.5-turbo", max_tokens=2000, temperature=0.4):
+def generate_semantic_improvements_guide(prompt, word_count, query, model="gpt-3.5-turbo", max_tokens=2000, temperature=0.4):
     prompt = truncate_to_token_length(prompt,1500)
     #for i in range(3):
         #try:
     gpt_response = openai.ChatCompletion.create(
         model=model,
         messages=[
-            {"role": "system", "content": """You are an expert at Semantic SEO. In particular, you are superhuman at taking  a given NLTK report on a given text corpus compiled from the text of the linked pages returned for a google search.
-            and using it to build a comprehensive set of instructions for an article writer that can be used to inform someone writing a long-form article about a given topic so that they can best fully cover the semantic SEO as shown in NLTK data from the SERP corpus. 
+            {"role": "system", "content": f"""You are an expert at Semantic SEO. In particular, you are superhuman at taking  a given NLTK report on a given text corpus compiled from the text of the linked pages returned for a google search.
+            and using it to build a comprehensive set of instructions for an article writer that can be used to inform someone writing a long-form article about a given topic under {word_count} words  so that they can best fully cover the semantic SEO as shown in NLTK data from the SERP corpus. 
              Provide the result in well formatted markdown. The goal of this guide is to help the writer make sure that the content they are creating is as comprehensive to the semantic SEO with a focus on what is most imprtant from a semantic SEO perspective."""},
             {"role": "user", "content": f"Semantic SEO data for the keyword based on the content that ranks on the first page of google for the given keyword query of: {query} and it's related semantic data:  {prompt}"}],
         max_tokens=max_tokens,
@@ -473,15 +474,15 @@ def generate_semantic_improvements_guide(prompt,query, model="gpt-3.5-turbo", ma
    
 
 @st.cache_data(show_spinner=False)
-def generate_outline(topic, model="gpt-3.5-turbo", max_tokens=1500):
-    prompt = f"Generate an incredibly thorough article outline for the topic: {topic}. Consider all possible angles and be as thorough as possible. Please use Roman Numerals for each section."
+def generate_outline(topic, model="gpt-3.5-turbo", max_tokens=500):
+    prompt = f"Generate an incredibly thorough article outline for the topic: {topic}. {topic} is the title of the article and the outline should only relate the {topic}. Don't create unnecessary outline, create only relevant to the topic. Consider all possible angles and be as thorough as possible. Please use Roman Numerals for each section."
     outline = generate_content(prompt, model=model, max_tokens=max_tokens)
     #save_to_file("outline.txt", outline)
     return outline
 
 @st.cache_data(show_spinner=False)
-def improve_outline(outline, semantic_readout, model="gpt-3.5-turbo", max_tokens=1500):
-    prompt = f"Given the following article outline, please improve and extend this outline significantly as much as you can keeping in mind the SEO keywords and data being provided in our semantic seo readout. Do not include a section about semantic SEO itself, you are using the readout to better inform your creation of the outline. Try and include and extend this as much as you can. Please use Roman Numerals for each section. The goal is as thorough, clear, and useful out line as possible exploring the topic in as much depth as possible. Think step by step before answering. Please take into consideration the semantic seo readout provided here: {semantic_readout} which should help inform some of the improvements you can make, though please also consider additional improvements not included in this semantic seo readout.  Outline to improve: {outline}."
+def improve_outline(outline, topic, semantic_readout, model="gpt-3.5-turbo", max_tokens=500):
+    prompt = f"Given the following article outline, please improve and extend this outline significantly as much as you can keeping in mind the SEO keywords and data being provided in our semantic seo readout. Do not include a section about semantic SEO itself, you are using the readout to better inform your creation of the outline. Try and include and extend this as much as you can. but remember, it should strictly follow the  Please use Roman Numerals for each section. The goal is as thorough, clear, and useful out line as possible exploring the topic in as much depth as possible. But depth should be decided as per the title only, {topic} is the title. it's strictly prohibited to create unnecessary outlines. Think step by step before answering. Please take into consideration the semantic seo readout provided here: {semantic_readout} which should help inform some of the improvements you can make, though please also consider additional improvements not included in this semantic seo readout.  Outline to improve: {outline}."
     improved_outline = generate_content(prompt, model=model, max_tokens=max_tokens)
     #save_to_file("improved_outline.txt", improved_outline)
     return improved_outline
@@ -489,14 +490,14 @@ def improve_outline(outline, semantic_readout, model="gpt-3.5-turbo", max_tokens
 
 
 @st.cache_data(show_spinner=False)
-def generate_sections(improved_outline, model="gpt-3.5-turbo", max_tokens=2000):
+def generate_sections(improved_outline,  model="gpt-3.5-turbo", max_tokens=2000):
     sections = []
 
     # Parse the outline to identify the major sections
     major_sections = []
     current_section = []
     for part in improved_outline:
-        if re.match(r'^[ \t]*[#]*[ \t]*(I|II|III|IV|V|VI|VII|VIII|IX|X|XI|XII|XIII|XIV|XV)\b', part):
+        if re.match(r'^[ \t][#][ \t]*(I|II|III|IV|V|VI|VII|VIII|IX|X|XI|XII|XIII|XIV|XV)\b', part):
             if current_section:  # not the first section
                 major_sections.append('\n'.join(current_section))
                 current_section = []
@@ -510,7 +511,7 @@ def generate_sections(improved_outline, model="gpt-3.5-turbo", max_tokens=2000):
         full_outline += '\n'.join(improved_outline)
         specific_section = ", and focusing specifically on the following section: "
         specific_section += section_outline
-        prompt =  specific_section + ", please write a thorough section that goes in-depth, provides detail and evidence, and adds as much additional value as possible. Keep whatever hierarchy you find. Never write a conclusion part of a section unless the section itself is supposed to be a conclusion. Section text:"
+        prompt =  specific_section + ", please write a thorough section that goes in-depth, provides detail and evidence. Keep whatever hierarchy you find. Never write a conclusion part of a section unless the section itself is supposed to be a conclusion. Section text:"
         section = generate_content(prompt, model=model, max_tokens=max_tokens)
         sections.append(section)
         #save_to_file(f"section_{i+1}.txt", section)
@@ -523,7 +524,7 @@ def improve_section(section, i, model="gpt-3.5-turbo", max_tokens=1500):
     improved_section = generate_content2(prompt, model=model, max_tokens=max_tokens)
     #st.markdown(improved_section)
     st.markdown(improved_section,unsafe_allow_html=True)
-    return " ".join(improved_section)  # join the lines into a single string
+    return "".join(improved_section)  # join the lines into a single string
 
 
 
@@ -547,7 +548,7 @@ def concatenate_files(file_names, output_file_name):
 
 
 @st.cache_data(show_spinner=False)
-def generate_article(topic, model="gpt-3.5-turbo", max_tokens_outline=2000, max_tokens_section=2000, max_tokens_improve_section=4000):
+def generate_article(topic, word_count, model="gpt-3.5-turbo", max_tokens_outline=2000, max_tokens_section=2000, max_tokens_improve_section=4000):
     status = st.empty()
     status.text('Analyzing SERPs...')
     
@@ -556,18 +557,18 @@ def generate_article(topic, model="gpt-3.5-turbo", max_tokens_outline=2000, max_
     summary = summarize_nlp(results)
 
     status.text('Generating semantic SEO readout...')
-    semantic_readout = generate_semantic_improvements_guide(topic, summary,  model=model, max_tokens=max_tokens_outline)
+    semantic_readout = generate_semantic_improvements_guide(topic, word_count, summary,  model=model, max_tokens=max_tokens_outline)
     
     
     status.text('Generating initial outline...')
-    initial_outline = generate_outline(topic, model=model, max_tokens=max_tokens_outline)
+    initial_outline = generate_outline(topic, model=model, max_tokens=500)
 
     status.text('Improving the initial outline...')
-    improved_outline = improve_outline(initial_outline, semantic_readout, model=model, max_tokens=1500)
+    improved_outline = improve_outline(initial_outline, semantic_readout, model=model, max_tokens=500)
     #st.markdown(improved_outline,unsafe_allow_html=True)
     
     status.text('Generating sections based on the improved outline...')
-    sections = generate_sections(improved_outline, model=model, max_tokens=max_tokens_section)
+    sections = generate_sections(improved_outline, model=model, max_tokens=word_count)
 
     status.text('Improving sections...')
     
@@ -582,43 +583,64 @@ def generate_article(topic, model="gpt-3.5-turbo", max_tokens_outline=2000, max_
 
     status.text('Finished')
     final_content = '\n'.join(improved_sections)
-#     html = markdown.markdown(final_content)
-#     plain_text = html2text.html2text(html)
+    html = markdown.markdown(final_content)
+    # plain_text = html_to_text(html)
     # Set the display option to show the complete text of a column
     pd.set_option('display.max_colwidth', None)
 
-     # WordPress credentials
+    refrencess = results.at[0, 'Final_Reference_Output']
+    html = html   + "<h2>References</h2>"  + refrencess
+    doc_save_content = final_content + '\n' + '\n' + "References" + '\n' + '\n' + markdownify(refrencess)
+    
+    #st.markdown(final_content,unsafe_allow_html=True)
+    file_name = f"{query}_final_article.docx"
+    link_text = "Click here to download complete article"
+    st.markdown(create_download_link(doc_save_content, file_name, link_text), unsafe_allow_html=True)
+    # st.markdown(final_content)
+    # wp_post(html, query)
+
+    # return html
+
+
+
+def html_to_text(html_text):
+    class MyHTMLParser(HTMLParser):
+        def _init_(self):
+            super()._init_()
+            self.text = ""
+
+        def handle_data(self, data):
+            self.text += data.strip()
+
+    parser = MyHTMLParser()
+    parser.feed(html_text)
+    return parser.text
+
+
+def wp_post(content_to_post, query):
+
+
+# WordPress credentials
     url = 'https://peblog.pivotroots.com/xmlrpc.php'
     username = 'Harshraj'
     password = "QeUei(FvTvJh&obsnN(*BUWm"
 
-        # Create a WordPress client
+
+# Create a WordPress client
     client = Client(url, username, password)
 
-        # Create a new post object
+# Create a new post object
     post = WordPressPost()
 
-        # Set the post title and content
-    post.title = 'Test'
-    post.content = improved_section
+# Set the post title and content
+    post.title = query
+    post.content = content_to_post
 
-        # Set the post status as 'draft'
+# Set the post status as 'draft'
     post.post_status = 'draft'
 
-        # Publish the post
+# Publish the post
     client.call(NewPost(post))
-
-
-    refrencess = markdownify(results.at[0, 'Final_Reference_Output'])
-    final_content = final_content + '\n' + "References" + '\n' + str(refrencess)
-    #st.markdown(final_content,unsafe_allow_html=True)
-    file_name = f"{query}_final_article.docx"
-    link_text = "Click here to download complete article"
-    st.markdown(create_download_link(final_content, file_name, link_text), unsafe_allow_html=True)
-    st.markdown(final_content)
-
-
-
    
 def create_download_link(string, file_name, link_text):
     # Create a new Word document
@@ -672,20 +694,16 @@ def main():
 
     # Get user input for API key
     user_api_key = st.text_input("Enter your OpenAI API key")
+    word_count = st.text_input("Enter Word Count")
 
     if st.button('Generate Content'):
         if user_api_key:
             openai.api_key = user_api_key
             with st.spinner("Generating content..."):
-                final_draft = generate_article(topic)
+                final_draft = generate_article(topic, word_count)
                 #st.markdown(final_draft)
         else:
             st.warning("Please enter your OpenAI API key above.")
 
-if __name__ == "__main__":
+if _name_ == "_main_":
     main()
-
-
-
-
-
