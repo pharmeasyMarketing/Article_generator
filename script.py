@@ -475,7 +475,7 @@ def generate_semantic_improvements_guide(prompt, word_count, query, model="gpt-3
 
 @st.cache_data(show_spinner=False)
 def generate_outline(topic, model="gpt-3.5-turbo", max_tokens=500):
-    prompt = f"Generate an incredibly thorough article outline for the topic: {topic}. {topic} is the title of the article and the outline should only relate the {topic}. Don't create unnecessary outline, create only relevant to the topic. Consider all possible angles and be as thorough as possible. Please use Roman Numerals for each section."
+    prompt = f"Generate an incredibly thorough article outline for the topic: {topic}. {topic} is the title of the article and the outline should only be created considering the {topic}. Don't create unnecessary outline, create only relevant to the title. Consider all possible angles and be as thorough as possible. Please use Roman Numerals for each section."
     outline = generate_content(prompt, model=model, max_tokens=max_tokens)
     #save_to_file("outline.txt", outline)
     return outline
@@ -525,8 +525,6 @@ def improve_section(section, i, model="gpt-3.5-turbo", max_tokens=1500):
     #st.markdown(improved_section)
     st.markdown(improved_section,unsafe_allow_html=True)
     return "".join(improved_section)  # join the lines into a single string
-
-
 
 
 
