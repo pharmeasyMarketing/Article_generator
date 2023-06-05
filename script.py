@@ -688,7 +688,7 @@ def main():
     if st.button("Publish Now"):
 
         # Call the wp_post() function with the final_draft variable
-        wp_post(final_draft, Blog URL, Username, Password, topic)
+        wp_post(final_draft, Blog_URL, Username, Password, topic)
     # Access the final_draft value here
 
 
