@@ -539,29 +539,6 @@ def concatenate_files(file_names, output_file_name):
     #print("Final draft created.\n")
     return final_draft
 
-def wp_post():
-    # Create a WordPress client
-    url = 'https://peblog.pivotroots.com/xmlrpc.php'
-    username = 'Harshraj'
-    password = "QeUei(FvTvJh&obsnN(*BUWm"
-    title = "testing"
-    content ="contnet"
-    
-    client = Client(url, username, password)
-  
-
-    # Create a new post object
-    post = WordPressPost()
-
-    # Set the post title and content
-    post.title = title
-    post.content = content
-
-    # Set the post status as 'draft'
-    post.post_status = 'draft'
-
-    # Publish the post
-    client.call(NewPost(post))
 
 
 @st.cache_data(show_spinner=False, experimental_allow_widgets=True) 
@@ -619,6 +596,29 @@ def generate_article(topic, model="gpt-3.5-turbo", max_tokens_outline=2000, max_
 
 # Call the generate_article() function with input values
 
+def wp_post():
+    # Create a WordPress client
+    url = 'https://peblog.pivotroots.com/xmlrpc.php'
+    username = 'Harshraj'
+    password = "QeUei(FvTvJh&obsnN(*BUWm"
+    title = "testing 2"
+    content = generate_article(topic, model="gpt-3.5-turbo", max_tokens_outline=2000, max_tokens_section=2000, max_tokens_improve_section=4000)
+    
+    client = Client(url, username, password)
+  
+
+    # Create a new post object
+    post = WordPressPost()
+
+    # Set the post title and content
+    post.title = title
+    post.content = content
+
+    # Set the post status as 'draft'
+    post.post_status = 'draft'
+
+    # Publish the post
+    client.call(NewPost(post))
 
 
    
