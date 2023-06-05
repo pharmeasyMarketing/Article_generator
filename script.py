@@ -556,7 +556,7 @@ def generate_article(topic, model="gpt-3.5-turbo", max_tokens_outline=2000, max_
     summary = summarize_nlp(results)
 
     status.text('Generating semantic SEO readout...')
-    semantic_readout = generate_semantic_improvements_guide(topic, summary,  model=model, max_tokens=max_tokens_outline)
+    semantic_readout = generate_semantic_improvements_guide(topic, summary, query, model=model, max_tokens=max_tokens_outline)
     
     
     status.text('Generating initial outline...')
