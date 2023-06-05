@@ -617,9 +617,6 @@ def generate_article(topic, model="gpt-3.5-turbo", max_tokens_outline=2000, max_
 # Call the generate_article() function with input values
 
 
-if st.button("Publish to WordPress"):
-# Call the wp_post() function with retrieved values
-    wp_post()
 
    
 def create_download_link(string, file_name, link_text):
