@@ -680,8 +680,8 @@ def main():
                 #st.markdown(final_draft)
         else:
             st.warning("Please enter your OpenAI API key above.")
-     user_input = st.text_input("Publish to WordPress? (Type 'yes' or 'no')")
-
+    
+    user_input = st.text_input("Publish to WordPress? (Type 'yes' or 'no')")
     if st.button("Submit") and user_input.lower() == "yes":
         # Call the wp_post() function
         wp_post()
