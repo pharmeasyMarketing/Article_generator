@@ -675,21 +675,19 @@ def main():
     # Get user input for API key
     user_api_key = st.text_input("Enter your OpenAI API key")
 
-    final_draft = None  # Define the variable with an initial value of None
-
     if st.button('Generate Content'):
         if user_api_key:
             openai.api_key = user_api_key
             with st.spinner("Generating content..."):
                 final_draft = generate_article(topic)
+                if st.button("Submit") and user_input.lower() == "yes":
+        # Call the wp_post() function with the final_draft variable
+                    wp_post(final_draft)
                 # st.markdown(final_draft)
         else:
             st.warning("Please enter your OpenAI API key above.")
 
     # Access the final_draft value here
-    if st.button("Submit") and final_draft is not None:
-        # Call the wp_post() function with the final_draft variable
-        wp_post(final_draft)
 
 
 if __name__ == "__main__":
