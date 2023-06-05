@@ -27,6 +27,7 @@ from docx import Document
 import json
 import base64
 from io import BytesIO
+import markdown
 # import markdown
 # import html2text
 from markdownify import markdownify
