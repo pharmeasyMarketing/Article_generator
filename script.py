@@ -594,7 +594,8 @@ def generate_article(topic, model="gpt-3.5-turbo", max_tokens_outline=2000, max_
     # st.markdown(final_content)
     # wp_post(html, query)
 
-    # return html
+    return html
+    
 def wp_post(final_draft, Blog_URL, Username, Password, topic):
     # Create a WordPress client
     url = Blog_URL + '/xmlrpc.php'
