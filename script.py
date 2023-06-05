@@ -497,12 +497,12 @@ def generate_sections(improved_outline, model="gpt-3.5-turbo", max_tokens=2000):
     major_sections = []
     current_section = []
     for part in improved_outline:
-        if re.match(r'^[ \t][#][ \t]*(I|II|III|IV|V|VI|VII|VIII|IX|X|XI|XII|XIII|XIV|XV)\b', part):wor
+        if re.match(r'^[ \t][#][ \t]*(I|II|III|IV|V|VI|VII|VIII|IX|X|XI|XII|XIII|XIV|XV)\b', part):
             if current_section:  # not the first section
                 major_sections.append('\n'.join(current_section))
                 current_section = []
         current_section.append(part)
-        if current_section:  # Append the last section
+    if current_section:  # Append the last section
         major_sections.append('\n'.join(current_section))
 
     # Generate content for each major section
@@ -516,7 +516,6 @@ def generate_sections(improved_outline, model="gpt-3.5-turbo", max_tokens=2000):
         sections.append(section)
         #save_to_file(f"section_{i+1}.txt", section)
     return sections
-
 @st.cache_data(show_spinner=False)
 def improve_section(section, i, model="gpt-3.5-turbo", max_tokens=1500):
     prompt = f"Given the following section of the article: {section}, please make thorough and improvements to this section. Keep whatever hierarchy you find. Only provide the updated section, not the text of your recommendation, just make the changes. Always provide the updated section in valid Markdown please. Updated Section with improvements:"
