@@ -602,7 +602,7 @@ password = "QeUei(FvTvJh&obsnN(*BUWm"
 # Create a button
 if st.button("Publish to WordPress"):
 # Call the wp_post() function with retrieved values
-wp_post(url, username, password, title, content)
+    wp_post(url, username, password, title, content)
     
 
 def wp_post(url, username, password, title, content):
