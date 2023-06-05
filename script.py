@@ -474,15 +474,15 @@ def generate_semantic_improvements_guide(prompt, word_count, query, model="gpt-3
    
 
 @st.cache_data(show_spinner=False)
-def generate_outline(topic, model="gpt-3.5-turbo", max_tokens=500):
-    prompt = f"Generate an incredibly thorough article outline for the topic: {topic}. {topic} is the title of the article and the outline should only be created considering the {topic}. Don't create unnecessary outline, create only relevant to the title. Consider all possible angles and be as thorough as possible. Please use Roman Numerals for each section."
+def generate_outline(topic, model="gpt-3.5-turbo", max_tokens=1500):
+    prompt = f"Generate an incredibly thorough article outline for the topic: {topic}. Consider all possible angles and be as thorough as possible. Please use Roman Numerals for each section."
     outline = generate_content(prompt, model=model, max_tokens=max_tokens)
     #save_to_file("outline.txt", outline)
     return outline
 
 @st.cache_data(show_spinner=False)
-def improve_outline(outline, topic, semantic_readout, model="gpt-3.5-turbo", max_tokens=500):
-    prompt = f"Given the following article outline, please improve and extend this outline significantly as much as you can keeping in mind the SEO keywords and data being provided in our semantic seo readout. Do not include a section about semantic SEO itself, you are using the readout to better inform your creation of the outline. Try and include and extend this as much as you can. but remember, it should strictly follow the  Please use Roman Numerals for each section. The goal is as thorough, clear, and useful out line as possible exploring the topic in as much depth as possible. But depth should be decided as per the title only, {topic} is the title. it's strictly prohibited to create unnecessary outlines. Think step by step before answering. Please take into consideration the semantic seo readout provided here: {semantic_readout} which should help inform some of the improvements you can make, though please also consider additional improvements not included in this semantic seo readout.  Outline to improve: {outline}."
+def improve_outline(outline, semantic_readout, model="gpt-3.5-turbo", max_tokens=1500):
+    prompt = f"Given the following article outline, please improve and extend this outline significantly as much as you can keeping in mind the SEO keywords and data being provided in our semantic seo readout. Do not include a section about semantic SEO itself, you are using the readout to better inform your creation of the outline. Try and include and extend this as much as you can. Please use Roman Numerals for each section. The goal is as thorough, clear, and useful out line as possible exploring the topic in as much depth as possible. Think step by step before answering. Please take into consideration the semantic seo readout provided here: {semantic_readout} which should help inform some of the improvements you can make, though please also consider additional improvements not included in this semantic seo readout.  Outline to improve: {outline}."
     improved_outline = generate_content(prompt, model=model, max_tokens=max_tokens)
     #save_to_file("improved_outline.txt", improved_outline)
     return improved_outline
@@ -490,7 +490,7 @@ def improve_outline(outline, topic, semantic_readout, model="gpt-3.5-turbo", max
 
 
 @st.cache_data(show_spinner=False)
-def generate_sections(improved_outline,  model="gpt-3.5-turbo", max_tokens=2000):
+def generate_sections(improved_outline, model="gpt-3.5-turbo", max_tokens=2000):
     sections = []
 
     # Parse the outline to identify the major sections
@@ -529,6 +529,8 @@ def improve_section(section, i, model="gpt-3.5-turbo", max_tokens=1500):
 
 
 
+
+
 @st.cache_data(show_spinner=False)
 def concatenate_files(file_names, output_file_name):
     final_draft = ''
@@ -559,14 +561,14 @@ def generate_article(topic, word_count, model="gpt-3.5-turbo", max_tokens_outlin
     
     
     status.text('Generating initial outline...')
-    initial_outline = generate_outline(topic, model=model, max_tokens=500)
+    initial_outline = generate_outline(topic, model=model, max_tokens=max_tokens_outline)
 
     status.text('Improving the initial outline...')
-    improved_outline = improve_outline(initial_outline, semantic_readout, model=model, max_tokens=500)
+    improved_outline = improve_outline(initial_outline, semantic_readout, model=model, max_tokens=1500)
     #st.markdown(improved_outline,unsafe_allow_html=True)
     
     status.text('Generating sections based on the improved outline...')
-    sections = generate_sections(improved_outline, model=model, max_tokens=word_count)
+    sections = generate_sections(improved_outline, model=model, max_tokens=max_tokens_section)
 
     status.text('Improving sections...')
     
