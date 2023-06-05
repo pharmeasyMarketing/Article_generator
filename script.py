@@ -556,7 +556,7 @@ def wp_post(url, username, password, title, content):
 
 
 @st.cache_data(show_spinner=False)
-def generate_article(topic, content, model="gpt-3.5-turbo", max_tokens_outline=2000, max_tokens_section=2000, max_tokens_improve_section=4000):
+def generate_article(topic, model="gpt-3.5-turbo", max_tokens_outline=2000, max_tokens_section=2000, max_tokens_improve_section=4000):
     status = st.empty()
     status.text('Analyzing SERPs...')
     
@@ -605,20 +605,18 @@ def generate_article(topic, content, model="gpt-3.5-turbo", max_tokens_outline=2
     link_text = "Click here to download complete article"
     st.markdown(create_download_link(final_content, file_name, link_text), unsafe_allow_html=True)
     st.markdown(final_content)
-    title = topic
     content = final_content
-    return title, content
+    return  content
 
 url = 'https://peblog.pivotroots.com/xmlrpc.php'
 username = 'Harshraj'
 password = "QeUei(FvTvJh&obsnN(*BUWm"
-
+title = "testing"
 # Call the generate_article() function with input values
-title, content = generate_article(topic, content)
 
 if st.button("Publish to WordPress"):
     # Call the wp_post() function with retrieved values
-    wp_post(url, username, password, title, content)
+    wp_post(url, username, password, title, generate_article(topic))
    
 def create_download_link(string, file_name, link_text):
     # Create a new Word document
