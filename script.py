@@ -596,13 +596,13 @@ def generate_article(topic, model="gpt-3.5-turbo", max_tokens_outline=2000, max_
 
 # Call the generate_article() function with input values
 
-def wp_post():
+def wp_post(final_draft):
     # Create a WordPress client
     url = 'https://peblog.pivotroots.com/xmlrpc.php'
     username = 'Harshraj'
     password = "QeUei(FvTvJh&obsnN(*BUWm"
     title = "testing 2"
-    content = generate_article(topic)
+    content = final_draft
     
     client = Client(url, username, password)
   
@@ -675,19 +675,22 @@ def main():
     # Get user input for API key
     user_api_key = st.text_input("Enter your OpenAI API key")
 
+    final_draft = None  # Define the variable with an initial value of None
+
     if st.button('Generate Content'):
         if user_api_key:
             openai.api_key = user_api_key
             with st.spinner("Generating content..."):
                 final_draft = generate_article(topic)
-                #st.markdown(final_draft)
+                # st.markdown(final_draft)
         else:
             st.warning("Please enter your OpenAI API key above.")
-    
-    user_input = st.text_input("Publish to WordPress? (Type 'yes' or 'no')")
-    if st.button("Submit") and user_input.lower() == "yes":
-        # Call the wp_post() function
-        wp_post()
+
+    # Access the final_draft value here
+    if st.button("Submit") and final_draft is not None:
+        # Call the wp_post() function with the final_draft variable
+        wp_post(final_draft)
+
 
 if __name__ == "__main__":
     main()
