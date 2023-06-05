@@ -497,7 +497,7 @@ def generate_sections(improved_outline, model="gpt-3.5-turbo", max_tokens=2000):
     major_sections = []
     current_section = []
     for part in improved_outline:
-        if re.match(r'^[ \t][#][ \t]*(I|II|III|IV|V|VI|VII|VIII|IX|X|XI|XII|XIII|XIV|XV)\b', part):
+        if re.match(r'^[ \t][#][ \t]*(I|II|III|IV|V|VI|VII|VIII|IX|X|XI|XII|XIII|XIV|XV)\b', part):wor
             if current_section:  # not the first section
                 major_sections.append('\n'.join(current_section))
                 current_section = []
@@ -548,7 +548,7 @@ def concatenate_files(file_names, output_file_name):
 
 
 @st.cache_data(show_spinner=False)
-def generate_article(topic, word_count, model="gpt-3.5-turbo", max_tokens_outline=2000, max_tokens_section=2000, max_tokens_improve_section=4000):
+def generate_article(topic, model="gpt-3.5-turbo", max_tokens_outline=2000, max_tokens_section=2000, max_tokens_improve_section=4000):
     status = st.empty()
     status.text('Analyzing SERPs...')
     
@@ -557,7 +557,7 @@ def generate_article(topic, word_count, model="gpt-3.5-turbo", max_tokens_outlin
     summary = summarize_nlp(results)
 
     status.text('Generating semantic SEO readout...')
-    semantic_readout = generate_semantic_improvements_guide(topic, word_count, summary,  model=model, max_tokens=max_tokens_outline)
+    semantic_readout = generate_semantic_improvements_guide(topic, summary,  model=model, max_tokens=max_tokens_outline)
     
     
     status.text('Generating initial outline...')
@@ -694,16 +694,16 @@ def main():
 
     # Get user input for API key
     user_api_key = st.text_input("Enter your OpenAI API key")
-    word_count = st.text_input("Enter Word Count")
+#     word_count = st.text_input("Enter Word Count")
 
     if st.button('Generate Content'):
         if user_api_key:
             openai.api_key = user_api_key
             with st.spinner("Generating content..."):
-                final_draft = generate_article(topic, word_count)
+                final_draft = generate_article(topic)
                 #st.markdown(final_draft)
         else:
             st.warning("Please enter your OpenAI API key above.")
 
-if _name_ == "_main_":
+if __name__ == "__main__":
     main()
