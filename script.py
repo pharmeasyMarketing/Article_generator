@@ -614,7 +614,7 @@ username = 'Harshraj'
 password = "QeUei(FvTvJh&obsnN(*BUWm"
 
 # Call the generate_article() function with input values
-title, content = generate_article(topic, html)
+title, content = generate_article(topic, content)
 
 if st.button("Publish to WordPress"):
     # Call the wp_post() function with retrieved values
