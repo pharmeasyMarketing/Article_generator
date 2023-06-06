@@ -689,6 +689,7 @@ def main():
     options = ['Published', 'Draft']
     status  = st.selectbox('Select an Publishing Option:', options)
     Post_status = status.lower()
+    st.write(Post_status)
     
     if st.button("Publish Now"):
         # Call the wp_post() function with the final_draft variable
