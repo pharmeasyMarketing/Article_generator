@@ -643,10 +643,9 @@ def create_download_link(string, file_name, link_text):
 def main():
     st.set_page_config(page_title="PharmEasy Article Generator")
 
-    st.title('PharmEasy Article Generator')   
+    st.title('PharmEasy Article Generator')
     st.header("Current Features")
     st.markdown("""
-
 * Scrapes the top 10 search results and creates SEO semantics using NLP.
 * Sends the SEO semantics to GPT-3.5 to generate an outline based on the semantics.
 * Improves the generated outline with the required sections.
@@ -655,17 +654,13 @@ def main():
 * Add References at the end of the article.
 * Option to define the desired word count for the article, but it may go up-down as per the intent of the article. 
 * Option to Save the Content in Wordpress Draft.
-
-
 """)
     st.header("Upcoming Features")
     st.markdown("""
-
 * Top 5 FAQs from "People Also Ask" section.
 """)
     st.header("Upcoming Improvements")
     st.markdown("""
-
 * Whitelisting Only some of the websites while adding the references.
 * 
 """)
@@ -674,7 +669,7 @@ def main():
 
     # Get user input for API key
     user_api_key = st.text_input("Enter your OpenAI API key")
-#     word_count = st.number_input("Define Word Count", step=1, format='%.0f', value=0)
+    word_count = st.number_input("Define Word Count", step=1, format='%d', value=0)
 
 # Now 'word_count' will be an integer without any decimal points
     
