@@ -594,7 +594,7 @@ def generate_article(topic, model="gpt-3.5-turbo", max_tokens_outline=2000, max_
 
     return html
     
-def wp_post(final_draft, Blog_URL, Username, Password, topic):
+def wp_post(final_draft, Blog_URL, Username, Password, topic, Post_status):
     # Create a WordPress client
     url = Blog_URL + '/xmlrpc.php'
     content = final_draft
@@ -609,7 +609,7 @@ def wp_post(final_draft, Blog_URL, Username, Password, topic):
     post.content = content
 
     # Set the post status as 'draft'
-    post.post_status = 'draft'
+    post.post_status = Post_status
 
     # Publish the post
     client.call(NewPost(post))
@@ -686,11 +686,14 @@ def main():
     Blog_URL = st.text_input("Write Your Blog URL WITHOUT SPACE")
     Username = st.text_input("Username")
     Password = st.text_input("Password")
+    options = ['Published', 'Draft']
+    selected_option = st.selectbox('Select an option:', options)
+    Post_status = selected_option.lower()
     
     if st.button("Publish Now"):
         # Call the wp_post() function with the final_draft variable
         final_draft = generate_article(topic)
-        wp_post(final_draft, Blog_URL, Username, Password, topic)
+        wp_post(final_draft, Blog_URL, Username, Password, topic,Post_status)
     # Access the final_draft value here
 
 
