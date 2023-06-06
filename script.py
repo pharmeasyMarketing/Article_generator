@@ -574,8 +574,6 @@ def generate_article(topic, model="gpt-3.5-turbo", max_tokens_outline=2000, max_
         time.sleep(5)
         improved_sections.append(improve_section(section_string, i, model=model, max_tokens=1200))
 
-
-
     status.text('Finished')
     final_content = '\n'.join(improved_sections)
     html = markdown.markdown(final_content)
@@ -645,9 +643,7 @@ def create_download_link(string, file_name, link_text):
 def main():
     st.set_page_config(page_title="PharmEasy Article Generator")
 
-
-    st.title('PharmEasy Article Generator')
-    
+    st.title('PharmEasy Article Generator')   
     st.header("Current Features")
     st.markdown("""
 
@@ -656,14 +652,22 @@ def main():
 * Improves the generated outline with the required sections.
 * Uses GPT-3.5 to write the article based on the improved sections.
 * After generating the article, it further improves the content and creates the final draft.
+* Add References at the end of the article.
+* Option to define the desired word count for the article, but it may go up-down as per the intent of the article. 
+* Option to Save the Content in Wordpress Draft.
+
+
 """)
     st.header("Upcoming Features")
     st.markdown("""
 
-* References at the end of the article.
-* Option to define the desired word count for the article.
-* Automatic draft saving in WordPress.
 * Top 5 FAQs from "People Also Ask" section.
+""")
+    st.header("Upcoming Improvements")
+    st.markdown("""
+
+* Whitelisting Only some of the websites while adding the references.
+* 
 """)
 
     topic = st.text_input("Enter topic:")
