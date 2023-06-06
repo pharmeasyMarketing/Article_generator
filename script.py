@@ -687,8 +687,7 @@ def main():
     Username = st.text_input("Username")
     Password = st.text_input("Password")
     options = ['Published', 'Draft']
-    selected_option = st.selectbox('Select an option:', options)
-    st.write(selected_option)
+    st.selectbox('Select an option:', options)
     Post_status = selected_option.lower()
     
     if st.button("Publish Now"):
