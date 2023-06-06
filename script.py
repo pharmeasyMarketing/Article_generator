@@ -688,7 +688,6 @@ def main():
     Password = st.text_input("Password")
     options = ['Published', 'Draft']
     status  = st.selectbox('Select an Publishing Option:', options)
-    st.write(status)
     Post_status = status.lower()
     
     if st.button("Publish Now"):
