@@ -644,11 +644,10 @@ def create_download_link(string, file_name, link_text):
 
 def main():
     st.set_page_config(page_title="PharmEasy Article Generator")
-
-
+    
     st.title('PharmEasy Article Generator')
-    st.header('Current Features')
-    st.markdown("""
+    st.header('Current Features')
+    st.markdown("""
 * Scrapes the top 10 search results and creates SEO semantics using NLP.
 * Sends the SEO semantics to GPT-3.5 to generate an outline based on the semantics.
 * Improves the generated outline with the required sections.
@@ -660,15 +659,13 @@ def main():
 
 
 """)
-    st.header('Upcoming Features')
-    st.markdown("""
+    st.header('Upcoming Features')
+    st.markdown("""
 
 * Top 5 FAQs from "People Also Ask" section.
 """)
-    
-    st.header('Upcoming Improvements')
-    st.markdown("""
-
+    st.header('Upcoming Improvements')
+    st.markdown("""
 * Whitelisting Only some of the websites while adding the references.
 * Trying to improve the Outline for better content.
 * To ask it strictly follow the word count. 
