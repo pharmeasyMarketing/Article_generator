@@ -474,14 +474,14 @@ def generate_semantic_improvements_guide(prompt,query, model="gpt-3.5-turbo", ma
    
 
 @st.cache_data(show_spinner=False)
-def generate_outline(topic, model="gpt-3.5-turbo", max_tokens=word_count):
+def generate_outline(topic, model="gpt-3.5-turbo", max_tokens=1500):
     prompt = f"Generate an incredibly thorough article outline for the topic: {topic}. Please use Roman Numerals for each section. The outline should complete the intent of {topic}."
     outline = generate_content(prompt, model=model, max_tokens=max_tokens)
     #save_to_file("outline.txt", outline)
     return outline
 
 @st.cache_data(show_spinner=False)
-def improve_outline(outline, semantic_readout, model="gpt-3.5-turbo", max_tokens=word_count):
+def improve_outline(outline, semantic_readout, model="gpt-3.5-turbo", max_tokens=1500):
     prompt = f"Given the following article outline, please improve and extend this outline significantly as much as you can keeping in mind the SEO keywords and data being provided in our semantic seo readout. Also limit the outline to complete in {max_tokens} words. Do not include a section about semantic SEO itself, you are using the readout to better inform your creation of the outline. Try and include and extend this as much as you can. Please use Roman Numerals for each section. The goal is as thorough, clear, and useful out line as possible exploring the topic in as much depth as possible. Think step by step before answering. Please take into consideration the semantic seo readout provided here: {semantic_readout} which should help inform some of the improvements you can make, though please also consider additional improvements not included in this semantic seo readout.  Outline to improve: {outline}."
     improved_outline = generate_content(prompt, model=model, max_tokens=max_tokens)
     #save_to_file("improved_outline.txt", improved_outline)
