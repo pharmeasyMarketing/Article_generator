@@ -647,23 +647,33 @@ def main():
 
 
     st.title('PharmEasy Article Generator')
-    
-    st.header("Current Features")
-    st.markdown("""
+    
+    st.header("Current Features")
+    st.markdown("""
 
 * Scrapes the top 10 search results and creates SEO semantics using NLP.
 * Sends the SEO semantics to GPT-3.5 to generate an outline based on the semantics.
 * Improves the generated outline with the required sections.
 * Uses GPT-3.5 to write the article based on the improved sections.
 * After generating the article, it further improves the content and creates the final draft.
-""")
-    st.header("Upcoming Features")
-    st.markdown("""
+* Add References at the end of the article.
+* Option to define the desired word count for the article, but it may go up-down as per the intent of the article. 
+* Option to Save the Content in Wordpress Draft.
 
-* References at the end of the article.
-* Option to define the desired word count for the article.
-* Automatic draft saving in WordPress.
+
+""")
+    st.header("Upcoming Features")
+    st.markdown("""
+
 * Top 5 FAQs from "People Also Ask" section.
+""")
+    
+      st.header("Upcoming Improvements")
+    st.markdown("""
+
+* Whitelisting Only some of the websites while adding the references.
+* Trying to improve the Outline for better content.
+* To ask it strictly follow the word count. 
 """)
 
     topic = st.text_input("Enter topic:")
