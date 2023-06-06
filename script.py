@@ -687,8 +687,9 @@ def main():
     Username = st.text_input("Username")
     Password = st.text_input("Password")
     options = ['Published', 'Draft']
-    st.selectbox('Select an option:', options)
-    Post_status = selected_option.lower()
+    status  = st.selectbox('Select an Publishing Option:', options)
+    st.write(status)
+    Post_status = status.lower()
     
     if st.button("Publish Now"):
         # Call the wp_post() function with the final_draft variable
