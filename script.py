@@ -475,14 +475,14 @@ def generate_semantic_improvements_guide(prompt,query, model="gpt-3.5-turbo", ma
 
 @st.cache_data(show_spinner=False)
 def generate_outline(topic, model="gpt-3.5-turbo", max_tokens=1500):
-    prompt = f"Generate an outline for the topic: {topic}."
+    prompt = f"Generate an incredibly thorough article outline for the topic: {topic}. Consider all possible angles and be as thorough as possible. Please use Roman Numerals for each section."
     outline = generate_content(prompt, model=model, max_tokens=max_tokens)
     #save_to_file("outline.txt", outline)
     return outline
 
 @st.cache_data(show_spinner=False)
 def improve_outline(outline, semantic_readout, model="gpt-3.5-turbo", max_tokens=1500):
-    prompt = f" See, if any possibility to improve the Outline. Outline to improve: {outline}."
+    prompt = f"Given the following article outline, please improve and extend this outline significantly as much as you can keeping in mind the SEO keywords and data being provided in our semantic seo readout. Do not include a section about semantic SEO itself, you are using the readout to better inform your creation of the outline. Try and include and extend this as much as you can. Please use Roman Numerals for each section. The goal is as thorough, clear, and useful out line as possible exploring the topic in as much depth as possible. Think step by step before answering. Please take into consideration the semantic seo readout provided here: {semantic_readout} which should help inform some of the improvements you can make, though please also consider additional improvements not included in this semantic seo readout.  Outline to improve: {outline}."
     improved_outline = generate_content(prompt, model=model, max_tokens=max_tokens)
     #save_to_file("improved_outline.txt", improved_outline)
     return improved_outline
@@ -543,7 +543,7 @@ def concatenate_files(file_names, output_file_name):
 
 
 @st.cache_data(show_spinner=False, experimental_allow_widgets=True) 
-def generate_article(topic,word_count, model="gpt-3.5-turbo", max_tokens_outline=2000, max_tokens_section=2000, max_tokens_improve_section=4000):
+def generate_article(topic, model="gpt-3.5-turbo", max_tokens_outline=2000, max_tokens_section=2000, max_tokens_improve_section=4000):
     status = st.empty()
     status.text('Analyzing SERPs...')
     
@@ -556,23 +556,23 @@ def generate_article(topic,word_count, model="gpt-3.5-turbo", max_tokens_outline
     
     
     status.text('Generating initial outline...')
-    initial_outline = generate_outline(topic, model=model, max_tokens=int(word_count*0.50))
+    initial_outline = generate_outline(topic, model=model, max_tokens=max_tokens_outline)
 
     status.text('Improving the initial outline...')
-    improved_outline = improve_outline(initial_outline, semantic_readout, model=model, max_tokens=int(word_count*0.50))
+    improved_outline = improve_outline(initial_outline, semantic_readout, model=model, max_tokens=1500)
     #st.markdown(improved_outline,unsafe_allow_html=True)
     
     status.text('Generating sections based on the improved outline...')
-    sections = generate_sections(improved_outline, model=model, max_tokens=word_count)
+    sections = generate_sections(improved_outline, model=model, max_tokens=max_tokens_section)
 
     status.text('Improving sections...')
-    
+        
     improved_sections = []
     for i, section in enumerate(sections):
         section_string = '\n'.join(section)
         status.text(f'Improving section {i+1} of {len(sections)}...')
         time.sleep(5)
-        improved_sections.append(improve_section(section_string, i, model=model, max_tokens=word_count))
+        improved_sections.append(improve_section(section_string, i, model=model, max_tokens=1200))
 
 
 
@@ -644,38 +644,33 @@ def create_download_link(string, file_name, link_text):
 
 def main():
     st.set_page_config(page_title="PharmEasy Article Generator")
-    
+
+
     st.title('PharmEasy Article Generator')
-    st.header('Current Features')
+    
+    st.header("Current Features")
     st.markdown("""
+
 * Scrapes the top 10 search results and creates SEO semantics using NLP.
 * Sends the SEO semantics to GPT-3.5 to generate an outline based on the semantics.
 * Improves the generated outline with the required sections.
 * Uses GPT-3.5 to write the article based on the improved sections.
 * After generating the article, it further improves the content and creates the final draft.
-* Add References at the end of the article.
-* Option to define the desired word count for the article, but it may go up-down as per the intent of the article. 
-* Option to Save the Content in Wordpress Draft.
-
-
 """)
-    st.header('Upcoming Features')
+    st.header("Upcoming Features")
     st.markdown("""
 
+* References at the end of the article.
+* Option to define the desired word count for the article.
+* Automatic draft saving in WordPress.
 * Top 5 FAQs from "People Also Ask" section.
-""")
-    st.header('Upcoming Improvements')
-    st.markdown("""
-* Whitelisting Only some of the websites while adding the references.
-* Trying to improve the Outline for better content.
-* To ask it strictly follow the word count. 
 """)
 
     topic = st.text_input("Enter topic:")
 
     # Get user input for API key
     user_api_key = st.text_input("Enter your OpenAI API key")
-    word_count = st.number_input("Define Word Count", step=1, format='%d', value=0)
+#     word_count = st.number_input("Define Word Count", step=1, format='%.0f', value=0)
 
 # Now 'word_count' will be an integer without any decimal points
     
@@ -683,7 +678,7 @@ def main():
         if user_api_key:
             openai.api_key = user_api_key
             with st.spinner("Generating content..."):
-                final_draft = generate_article(topic, word_count)
+                final_draft = generate_article(topic)
                 # st.markdown(final_draft)
         else:
             st.warning("Please enter your OpenAI API key above.")
@@ -695,7 +690,7 @@ def main():
     
     if st.button("Publish Now"):
         # Call the wp_post() function with the final_draft variable
-        final_draft = generate_article(topic, word_count)
+        final_draft = generate_article(topic)
         wp_post(final_draft, Blog_URL, Username, Password, topic)
     # Access the final_draft value here
 
