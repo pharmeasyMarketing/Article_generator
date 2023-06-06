@@ -647,7 +647,6 @@ def main():
 
 
     st.title('PharmEasy Article Generator')
-    
     st.header("Current Features")
     st.markdown("""
 
