@@ -374,7 +374,7 @@ def generate_content(prompt, model="gpt-3.5-turbo", max_tokens=1000, temperature
     gpt_response = openai.ChatCompletion.create(
         model=model,
         messages=[
-            {"role": "system", "content": "Simulate an exceptionally talented journalist and editor. Given the following instructions, think step by step and produce the best possible output you can."},
+            {"role": "system", "content": "Simulate an exceptionally talented expert medical professional. Given the following instructions, think step by step and produce the best possible output you can."},
             {"role": "user", "content": prompt}],
         max_tokens=max_tokens,
         n=1,
@@ -401,7 +401,7 @@ def generate_content2(prompt, model="gpt-3.5-turbo", max_tokens=1000, temperatur
     gpt_response = openai.ChatCompletion.create(
         model=model,
         messages=[
-            {"role": "system", "content": "Simulate an exceptionally talented journalist and editor. Given the following instructions, think step by step and produce the best possible output you can. Return the results in Nicely formatted markdown please."},
+            {"role": "system", "content": "Simulate an exceptionally talented medical professional. Given the following instructions, think step by step and produce the best possible output you can. Return the results in Nicely formatted markdown please."},
             {"role": "user", "content": prompt}],
         max_tokens=max_tokens,
         n=1,
@@ -429,7 +429,7 @@ def generate_content3(prompt, model="gpt-3.5-turbo", max_tokens=1000, temperatur
     gpt_response = openai.ChatCompletion.create(
         model=model,
         messages=[
-            {"role": "system", "content": "Simulate an exceptionally talented investigative journalist and researcher. Given the following text, please write a short paragraph providing only the most important facts and takeaways that can be used later when writing a full analysis or article."},
+            {"role": "system", "content": "Simulate an exceptionally talented investigative medical professional and researcher. Given the following text, please write a short paragraph providing only the most important facts and takeaways that can be used later when writing a full analysis or article."},
             {"role": "user", "content": f"Use the following text to provide the readout: {prompt}"}],
         max_tokens=max_tokens,
         n=1,
@@ -474,10 +474,27 @@ def generate_semantic_improvements_guide(prompt,query, model="gpt-3.5-turbo", ma
    
 
 @st.cache_data(show_spinner=False)
-def generate_outline(topic, model="gpt-3.5-turbo", max_tokens=1500):
-    prompt = f"Generate an incredibly thorough article outline for the topic: {topic}. Consider all possible angles and be as thorough as possible. Please use Roman Numerals for each section."
-    outline = generate_content(prompt, model=model, max_tokens=max_tokens)
+def generate_outline(topic, model="gpt-3.5-turbo", max_tokens=1000, temperature=0.2):
+    # prompt = f"Generate an incredibly thorough article outline for the topic: {topic}. Consider all possible angles and be as thorough as possible. Please use Roman Numerals for each section."
+    # outline = generate_content(prompt, model=model, max_tokens=max_tokens)
     #save_to_file("outline.txt", outline)
+
+    gpt_response = openai.ChatCompletion.create(
+        model=model,
+        messages=[
+
+            {"role": "system", "content": "As an extremely experienced doctor, generate an outline for the below article. Don't explain things in outline, only give headings and it's subheadings. you can give upto 10 level of subheadings depending upon topic."},            
+            {"role": "user", "content": topic }],
+        max_tokens=max_tokens,
+        n=1,
+        stop=None,
+        temperature=temperature,
+    )
+    response = gpt_response['choices'][0]['message']['content'].strip()
+    outline = response
+    st.header("Outline")
+    st.markdown(outline)
+
     return outline
 
 @st.cache_data(show_spinner=False)
@@ -485,6 +502,8 @@ def improve_outline(outline, semantic_readout, model="gpt-3.5-turbo", max_tokens
     prompt = f"Given the following article outline, please improve and extend this outline significantly as much as you can keeping in mind the SEO keywords and data being provided in our semantic seo readout. Do not include a section about semantic SEO itself, you are using the readout to better inform your creation of the outline. Try and include and extend this as much as you can. Please use Roman Numerals for each section. The goal is as thorough, clear, and useful out line as possible exploring the topic in as much depth as possible. Think step by step before answering. Please take into consideration the semantic seo readout provided here: {semantic_readout} which should help inform some of the improvements you can make, though please also consider additional improvements not included in this semantic seo readout.  Outline to improve: {outline}."
     improved_outline = generate_content(prompt, model=model, max_tokens=max_tokens)
     #save_to_file("improved_outline.txt", improved_outline)
+    st.header("Improve outline")
+    st.markdown(improved_outline)
     return improved_outline
 
 
@@ -511,7 +530,7 @@ def generate_sections(improved_outline, model="gpt-3.5-turbo", max_tokens=1500):
         full_outline += '\n'.join(improved_outline)
         specific_section = ", and focusing specifically on the following section: "
         specific_section += section_outline
-        prompt =  specific_section + ", please write a thorough section that goes in-depth, provides detail and evidence, and adds as much additional value as possible. Keep whatever hierarchy you find. Never write a conclusion part of a section unless the section itself is supposed to be a conclusion. Section text:"
+        prompt =  specific_section + ", please write a thorough section that goes in-depth, provides detail and evidence, and adds as much additional value as possible. Keep whatever hierarchy you find. Never write a conclusion part of a section. Only write conclusion for coclusion heading mentioned in outline Section text:"
         section = generate_content(prompt, model=model, max_tokens=max_tokens)
         sections.append(section)
         #save_to_file(f"section_{i+1}.txt", section)
@@ -526,20 +545,30 @@ def improve_section(section, i, model="gpt-3.5-turbo", max_tokens=1500):
     st.markdown(improved_section,unsafe_allow_html=True)
     return "".join(improved_section)  # join the lines into a single string
 
+
 @st.cache_data(show_spinner=False)
-def concatenate_files(file_names, output_file_name):
-    final_draft = ''
-    
-    for file_name in file_names:
-        with open(file_name, 'r') as file:
-            final_draft += file.read() + "\n\n"  # Add two newline characters between sections
+def generate_summary(query ,model="gpt-3.5-turbo", max_tokens=1000, temperature=0.2):
+#     prompt = truncate_to_token_length(question,2500)
+    #st.write(prompt)
+    #for i in range(3):
+        #try:
+    gpt_response = openai.ChatCompletion.create(
+        model=model,
+        messages=[
 
-    with open(output_file_name, 'w') as output_file:
-        output_file.write(final_draft)
+            {"role": "system", "content": "Generate a summary of the below article in 100 words in bullet points."},            
+            {"role": "user", "content": query }],
+        max_tokens=max_tokens,
+        n=1,
+        stop=None,
+        temperature=temperature,
+    )
+    response = gpt_response['choices'][0]['message']['content'].strip()
+    response = response
 
-    #print("Final draft created.\n")
-    return final_draft
-
+    st.header("Summary")
+    st.markdown(response)
+    return response
 
 
 @st.cache_data(show_spinner=False, experimental_allow_widgets=True) 
@@ -555,15 +584,17 @@ def generate_article(topic, model="gpt-3.5-turbo", max_tokens_outline=2000, max_
     semantic_readout = generate_semantic_improvements_guide(topic, summary,  model=model, max_tokens=max_tokens_outline)
     
     
-    status.text('Generating initial outline...')
+    status.text('Generating  outline...')
     initial_outline = generate_outline(topic, model=model, max_tokens=max_tokens_outline)
 
     status.text('Improving the initial outline...')
-    improved_outline = improve_outline(initial_outline, semantic_readout, model=model, max_tokens=1500)
-    #st.markdown(improved_outline,unsafe_allow_html=True)
+    improved_outline = improve_outline(initial_outline, semantic_readout, model=model, max_tokens=1000)
+    # st.markdown(improved_outline,unsafe_allow_html=True)
     
-    status.text('Generating sections based on the improved outline...')
+    status.text('Generating sections based on the outline...')
     sections = generate_sections(improved_outline, model=model, max_tokens=max_tokens_section)
+
+    summary = generate_summary(query)
 
     status.text('Improving sections...')
         
@@ -574,18 +605,34 @@ def generate_article(topic, model="gpt-3.5-turbo", max_tokens_outline=2000, max_
         time.sleep(5)
         improved_sections.append(improve_section(section_string, i, model=model, max_tokens=1200))
 
+
+    qa_dict = faq(query)
     status.text('Finished')
     final_content = '\n'.join(improved_sections)
-    html = markdown.markdown(final_content)
+    html_content = markdown.markdown(final_content)
+    summary_html = markdown.markdown(summary)
+    html = f"<h2>Summary</h2>" + summary_html
+    html = html + html_content
+    
     # plain_text = html_to_text(html)
     # Set the display option to show the complete text of a column
     pd.set_option('display.max_colwidth', None)
 
     refrencess = results.at[0, 'Final_Reference_Output']
+    # html = html   + "<h2>References</h2>"  + refrencess
+    html = html + "<h2>Frequently Asked Questions</h2>"
+    # doc_save_content = final_content + '\n' + '\n' + "References" + '\n' + '\n' + markdownify(refrencess)
+    doc_save_content = "Summary" + '\n' + '\n' + summary + '\n'
+    doc_save_content = doc_save_content + final_content +'\n' + '\n' + "Frequently Asked Question" + '\n'
+    st.header("Frequently Asked Question")
+    for question, answer in qa_dict.items():
+        html = html + f"<h3>{question}</h3>" + f"<p>{answer}</p>"
+        doc_save_content = doc_save_content + '\n' + f"Question: {question}" + '\n' + f"Answer: {answer}" + '\n'
+        st.markdown(f"Question: {question}")
+        st.markdown(f"Answer: {answer}")
     html = html   + "<h2>References</h2>"  + refrencess
-    doc_save_content = final_content + '\n' + '\n' + "References" + '\n' + '\n' + markdownify(refrencess)
-    
-    #st.markdown(final_content,unsafe_allow_html=True)
+    doc_save_content = doc_save_content + '\n' + '\n' + "References" + '\n' + '\n' + markdownify(refrencess)
+
     file_name = f"{query}_final_article.docx"
     link_text = "Click here to download complete article"
     st.markdown(create_download_link(doc_save_content, file_name, link_text), unsafe_allow_html=True)
@@ -614,7 +661,72 @@ def wp_post(final_draft, Blog_URL, Username, Password, topic, Post_status):
     # Publish the post
     client.call(NewPost(post))
 
+# function to scrap questions
+@st.cache_data(show_spinner=False)
+def scrape_paa_questions(query):
+    # Format the query for the Google search URL
+    formatted_query = query.replace(' ', '+')
+    search_url = f"https://www.google.com/search?q={formatted_query}"
 
+    # Send an HTTP GET request to Google search
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'}
+    response = requests.get(search_url, headers=headers)
+    response.raise_for_status()
+
+    # Parse the HTML response using BeautifulSoup
+    soup = BeautifulSoup(response.text, 'html.parser')
+
+    # Find the PAA questions in the search results
+    paa_divs = soup.find_all('div', class_='xpc')
+    paa_questions = []
+
+    for paa_div in paa_divs:
+        question = paa_div.text
+        paa_questions.append(question)
+
+    return paa_questions
+
+# function to get answers from open api
+@st.cache_data(show_spinner=False)
+def get_answer(question, model="gpt-3.5-turbo", max_tokens=270, temperature=0.2):
+
+    gpt_response = openai.ChatCompletion.create(
+        model=model,
+        messages=[
+            {"role": "system", "content": "As an extremely experienced doctor, give answer to the questions considering the reader as common person, not from medical field. the answer should be to the point. The content should be plagiarism free. "},
+            {"role": "user", "content": question }],
+        max_tokens=max_tokens,
+        n=1,
+        stop=None,
+        temperature=temperature,
+    )
+    response = gpt_response['choices'][0]['message']['content'].strip()
+    response = response
+    return response
+
+# function to concate question and answer and return a dict
+@st.cache_data(show_spinner=False)
+def faq(query):
+    paa_questions = scrape_paa_questions(query)
+    qa_dict = {}
+
+    # Get the answer for each question
+    for question in paa_questions:
+        answer = get_answer(question)
+        qa_dict[question] = answer
+
+    # Write the question-answer pairs to a file
+    # file_name = f"{query}_qa_pairs.txt"
+
+    # with open(file_name, "w") as file:
+    #     for question, answer in qa_dict.items():
+    #         file.write(f"Question: {question}\n")
+    #         file.write(f"Answer: {answer}\n")
+    #         file.write("\n")
+
+
+    return qa_dict
    
 def create_download_link(string, file_name, link_text):
     # Create a new Word document
@@ -644,7 +756,7 @@ def main():
     st.set_page_config(page_title="PharmEasy Article Generator")
 
     st.title('PharmEasy Article Generator')
-    st.header("Current Features")
+    st.header("Current Features Test")
     st.markdown("""
 * Scrapes the top 10 search results and creates SEO semantics using NLP.
 * Sends the SEO semantics to GPT-3.5 to generate an outline based on the semantics.
@@ -654,15 +766,16 @@ def main():
 * Add References at the end of the article.
 * Option to define the desired word count for the article, but it may go up-down as per the intent of the article. 
 * Option to Save the Content in Wordpress Draft.
+* Top 5 FAQs fro "People Also Ask" section.
 """)
-    st.header("Upcoming Features")
-    st.markdown("""
-* Top 5 FAQs from "People Also Ask" section.
-""")
+#     st.header("Upcoming Features")
+#     st.markdown("""
+# * Top 5 FAQs from "People Also Ask" section.
+# """)
     st.header("Upcoming Improvements")
     st.markdown("""
 * Whitelisting Only some of the websites while adding the references.
-* 
+ 
 """)
 
     topic = st.text_input("Enter topic:")
@@ -685,7 +798,7 @@ def main():
     st.header("Publish to Wordpress")
     Blog_URL = st.text_input("Write Your Blog URL WITHOUT SPACE")
     Username = st.text_input("Username")
-    Password = st.text_input("Password")
+    Password = st.text_input("Password", type="password")
     options = ['Publish', 'Draft']
     status  = st.selectbox('Select an Publishing Option:', options)
     Post_status = status.lower()    
@@ -698,8 +811,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-
-
-
