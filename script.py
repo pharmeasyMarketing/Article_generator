@@ -1075,7 +1075,7 @@ def main():
     Blog_URL = st.text_input("Write Your Blog URL WITHOUT SPACE")
     Username = st.text_input("Username")
     Password = st.text_input("Password", type="password")
-    options = ["Publish", "Draft"]
+    options = ["Draft", "Publish"]
     status = st.selectbox("Select an Publishing Option:", options)
     Post_status = status.lower()
     if st.button("Publish Now"):
