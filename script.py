@@ -1057,7 +1057,7 @@ def main():
     Introduction_conclusion_input = st.text_input("Define Introduction & Conclusion Heading")
 
     # Get user input for API key
-    user_api_key = st.text_input("Enter your OpenAI API key" type="password")
+    user_api_key = st.text_input("Enter your OpenAI API key", type="password")
     # word_count = st.number_input("Define Word Count", step=1, format="%d", value=0)
 
     # Now 'word_count' will be an integer without any decimal points
