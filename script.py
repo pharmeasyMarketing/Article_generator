@@ -1053,8 +1053,8 @@ def main():
 """
     )
 
-    topic = st.text_input("Enter topic:")
-    Introduction_conclusion_input = st.text_input("Define Introduction & Conclusion Heading")
+    topic = st.text_input("Enter topic:", placeholder="eg: Cancer: Causes, Symptoms, Treatment")
+    Introduction_conclusion_input = st.text_input("Main Topic for Intro & Conclusion", placeholder=" eg: Cancer")
 
     # Get user input for API key
     user_api_key = st.text_input("Enter your OpenAI API key", type="password")
