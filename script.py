@@ -1072,9 +1072,9 @@ def main():
             st.warning("Please enter your OpenAI API key above.")
 
     st.header("Publish to Wordpress")
-    Blog_URL = st.text_input("Write Your Blog URL WITHOUT SPACE")
-    Username = st.text_input("Username")
-    Password = st.text_input("Password", type="password")
+    Blog_URL = st.text_input("Write Your Blog URL", placeholder="URL Without Space")
+    Username = st.text_input("Username", placeholder="wordpress username")
+    Password = st.text_input("Password", type="password", placeholder="wordpress password")
     options = ["Draft", "Publish"]
     status = st.selectbox("Select an Publishing Option:", options)
     Post_status = status.lower()
