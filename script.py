@@ -678,7 +678,7 @@ def generate_sections(improved_outline, model="gpt-3.5-turbo", max_tokens=1500):
 
 
 @st.cache_data(show_spinner=False)
-def improve_section(section, sementic_readout, i, model="gpt-3.5-turbo", max_tokens=1500):
+def improve_section(section, topic, sementic_readout, i, model="gpt-3.5-turbo", max_tokens=1500):
     # prompt = f"Given the following section of the article: {section}, please make thorough and improvements to this section.Only provide the updated section, not the text of your recommendation, just make the changes. Always provide the updated section in valid Markdown please. As an experienced doctor try to compress each section in short, crispy and to the point sentences making it user friendly, without missing the important detail of the section, Also but don't say in the article as an experienced doctor I, etc etc. If it's possible create bullet friendly article. Don't write for doctors or journals! write it for patients, example: doctor may advice patients..., You should visit... etc . Also, try to use less technical words as much as possible, it should be in lemon language.  Never write conclusion in any section, example: In conclusion,..... . Updated Section with improvements:"
     # prompt = f"Given the following section of the article: {section}, please make thorough and improvements to this section. use sementic readout in related sections to create SEO friendly article, sementic readout: {sementic_readout}.Please strictly remember to not include a section about semantic SEO itself, you are using the readout to better improve the overall article.  Don't Only provide the updated section, not the text of your recommendation, just make the changes. Please ensure to provide the updated sections in valid Markdown please. As an experienced doctor try to compress each section in short, crispy and to the point sentences making it user friendly please, without missing the important detail of the section, Also please ensure not to write these thing in the sections: As a medical professional bla,bla bla.., As an experienced doctor bla, bla, bla..., and similar phrases like this. For better readability, Please use bullet points and paragraphs in the article along as needed. Never write conclusion part in any section, for example- after completing any section information don't write- In conclusion, bla, bla, bla..... . Don't write for doctors or journals! write it for patients, example: write like this- doctor may advice patients..., You should visit... etc not like this- As a medical professionals, you should blah bla bla... . Also, try to use less technical words as much as possible, it should be in lemon language. Each section should be only related to the topic given, for example: if we are taking about stent placement for kidney stone, the section should not discuss for stent placement in veins. Don't repeat any information if it has been told earlier in any of the sentences. Please ensure not to write conclusion part at last of the any section, example: In conclusion, ..... .  Updated Section with improvements:"
     prompt = f'''
@@ -689,9 +689,10 @@ def improve_section(section, sementic_readout, i, model="gpt-3.5-turbo", max_tok
     Remember the following guidelines:
 
     - Do not write for doctors or journals; write for patients. For example, instead of saying "As a medical professional, you should," write "Your doctor may advise you to" or "You should visit."
-    - Use bullet points and paragraphs for better readability.
+    - Use mix of bullet points and paragraphs for better readability,only when needed.
     - Always add section in valid markdown and heading.
     - Avoid technical jargon as much as possible. Use simple and understandable language.
+    - All the section should be related to the {topic}
     - Avoid using medicine names in the content.
     - Avoid repeating information if it has been mentioned earlier in the section.
 
@@ -785,7 +786,7 @@ def generate_article(
         status.text(f"Improving section {i+1} of {len(sections)}...")
         time.sleep(5)
         improved_sections.append(
-            improve_section(section_string, semantic_readout, i, model=model, max_tokens=1200)
+            improve_section(section_string, topic, semantic_readout, i, model=model, max_tokens=1200)
         )
 
     qa_dict = faq(query)
