@@ -767,7 +767,7 @@ def generate_article(
         status.text(f"Improving section {i+1} of {len(sections)}...")
         time.sleep(5)
         improved_sections.append(
-            improve_section(section_string, sementic_readout, i, model=model, max_tokens=1200)
+            improve_section(section_string, semantic_readout, i, model=model, max_tokens=1200)
         )
 
     qa_dict = faq(query)
