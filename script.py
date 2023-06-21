@@ -628,8 +628,9 @@ def generate_outline(topic, Introduction_conclusion_input, model="text-davinci-0
 
     outline = response.choices[0].text.strip()
     outline = outline.split('\n')
+    outline_to_display = response.choices[0].text.strip()
     st.header("Outline")
-    st.markdown(outline)
+    st.markdown(outline_to_display)
     return outline
 
 
