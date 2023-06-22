@@ -495,7 +495,7 @@ def generate_content2(prompt, model="gpt-3.5-turbo", max_tokens=1000, temperatur
         messages=[
             {
                 "role": "system",
-                "content": "Simulate an exceptionally talented medical professional. Given the following instructions, think step by step and produce the best possible output you can. Return the results in Nicely formatted markdown please.",
+                "content": "Simulate an exceptionally talented medical professional. Given the following instructions, think step by step and produce the best possible output you can. Return the results in Nicely formatted markdown please. ",
             },
             {"role": "user", "content": prompt},
         ],
@@ -610,36 +610,38 @@ def generate_semantic_improvements_guide(
 
     # return outline
 
-def generate_outline(topic, Introduction_conclusion_input, model="text-davinci-003", max_tokens=1000, temperature=0.2):
+def generate_outline(topic, Introduction_conclusion_input, model="text-davinci-003", max_tokens=1000, temperature=1):
     model = "text-davinci-003"
-    max_tokens = 1000
-    temperature = 0.4
-
     # prompt = f"Generate a purposeful outline with intent-focused headings and subheadings, structured with proper Roman numerals, Roman numerals should be aligned well, for the topic: {topic}. The outline should effectively align with the intended scope of the topic. Utilize a hierarchical organization for the headings and subheadings, maintaining clarity and coherence. You may incorporate up to 10 levels of subheadings, depending on the topic's complexity, but only if necessary. Additionally, include an introductory section and a conclusion as headings, without subheadings, while ensuring they remain within the intended scope of the topic without providing detailed explanations."
-    prompt = f"Generate a purposeful outline with intent-focused headings and subheadings, structured with proper Roman numerals, Roman numerals should be aligned well, for the topic: {topic}. The outline should effectively align with the intended scope of the topic. Utilize a hierarchical organization for the headings and subheadings, maintaining clarity and coherence. You may incorporate up to 10 levels of subheadings, depending on the topic's complexity, but only if necessary. Additionally, include an introductory section of the {Introduction_conclusion_input} (example: Introduction - {Introduction_conclusion_input})  and a conclusion of {Introduction_conclusion_input} the topic (example: conclusion - {Introduction_conclusion_input} ) as headings, without subheadings, while ensuring they remain within the intended scope of the topic without providing detailed explanations."
+    # prompt = f"Generate a purposeful outline with intent-focused headings and subheadings, structured with proper Roman numerals, Roman numerals should be aligned well, for the topic: {topic}. The outline should effectively align with the intended scope of the topic. Utilize a hierarchical organization for the headings and subheadings, maintaining clarity and coherence. Please please please strictly Avoid including the Introduction, overview and conclusion in the outline, ensuring that they are not part of the layout and never add them while generating the outline."
+    prompt = f"Generate a purposeful outline with intent-focused headings and subheadings, structured with proper Roman numerals, Roman numerals should be aligned well, for the topic: {topic}. The outline should effectively align with the intended scope of the topic. Utilize a hierarchical organization for the headings and subheadings, maintaining clarity and coherence. Please please please strictly Avoid including the Introduction, overview and conclusion in the outline, ensuring that they are not part of the layout and never add them while generating the outline."
     response = openai.Completion.create(
         engine=model,
         prompt=prompt,
         max_tokens=max_tokens,
-        temperature=temperature,
+        temperature=1,
         n=1,
         stop=None,
     )
 
     outline = response.choices[0].text.strip()
+    outline_to_display = outline
     outline = outline.split('\n')
     st.header("Outline")
-    st.markdown(outline)
+    st.markdown(outline_to_display)
     return outline
 
 
 @st.cache_data(show_spinner=False)
 def improve_outline(outline, semantic_readout, model="gpt-3.5-turbo", max_tokens=1500):
-    prompt = f"Given the following article outline, please significantly improve it while considering SEO keywords and semantic SEO data. Use semantic SEO data only if it aligns with the intent of the topic. Please note that the section about semantic SEO itself should not be included in the outline. Use Roman numerals for each section. The goal is to create a thorough, clear, and useful outline that explores the topic in depth. Think step by step before answering. Please take into consideration the provided semantic SEO readout, {semantic_readout}, which should help inform some improvements you can make. The introduction and conclusion should not be broken down into subheadings. While improving the outline, please stay focused on the topic without going beyond it or creating additional outlines, even if mentioned in the semantic readout. Outline to improve: {outline}."
+    # prompt = f"Given the following article outline, please significantly improve it while considering SEO keywords and semantic SEO data. Use semantic SEO data only if it aligns with the intent of the topic. Please note that the section about semantic SEO itself should not be included in the outline. Use Roman numerals for each section. The goal is to create a thorough, clear, and useful outline that explores the topic in depth. Think step by step before answering. Please take into consideration the provided semantic SEO readout, {semantic_readout}, which should help inform some improvements you can make. The introduction and conclusion should not be broken down into subheadings. While improving the outline, please stay focused on the topic without going beyond it or creating additional outlines, even if mentioned in the semantic readout. Outline to improve: {outline}."
+    
+    # prompt = f"Given the following article outline, please significantly improve it while considering SEO keywords and semantic SEO data. Use semantic SEO data only if it aligns with the intent of the topic. Please note that the section about semantic SEO itself should not be included in the outline. Use Roman numerals for each section. The goal is to give instructions to each outline using the sementic seo data. Think step by step before answering. Please take into consideration the provided semantic SEO readout, {semantic_readout}, which should help inform some improvements you can make. The introduction and conclusion should not be broken down into subheadings. While improving the outline, please stay focused on the topic without going beyond it or creating additional outlines, even if mentioned in the semantic readout. Outline to improve: {outline}."  
+    prompt = f"Given the following article outline, please significantly give instruction in the outline while considering SEO keywords and semantic SEO data.Please please please strictly ensure that the section about semantic SEO itself should not be included in the outline. The goal is to give instructions to each outline using the sementic seo readout data. Do not create additional outline, only give instruction to the existing outline using semetic seo readout data. Think step by step before answering. Please take into consideration the provided semantic SEO readout, {semantic_readout}, which should help inform some improvements you can make. While instructing the outline, please stay focused on the topic without going beyond it or creating additional outlines, even if mentioned in the semantic readout.Please please please strictly Avoid including the Introduction, overview and conclusion in the instructed outline, ensuring that they are not part of the layout and never add them while instructing the outline. Use Roman numerals for each section. Outline to instruct: {outline}." 
     improved_outline = generate_content(prompt, model=model, max_tokens=max_tokens)
     # save_to_file("improved_outline.txt", improved_outline)
-    st.header("Improve outline")
-    st.markdown(improved_outline)
+    # st.header("Improve outline")
+    # st.markdown(improved_outline)
     return improved_outline
 
 @st.cache_data(show_spinner=False)
@@ -669,7 +671,7 @@ def generate_sections(improved_outline, model="gpt-3.5-turbo", max_tokens=1500):
         specific_section += section_outline
         prompt = (
             specific_section
-            + ", please write a thorough section that goes in-depth, provides detail and evidence, and adds as much additional value as possible. Keep whatever hierarchy you find. Never write a conclusion part of a section."
+            + ", please write a thorough section that goes in-depth, provides detail and evidence, and adds as much additional value as possible. Keep whatever hierarchy you find. Never write a conclusion part of a section. "
         )
         section = generate_content(prompt, model=model, max_tokens=max_tokens)
         sections.append(section)
@@ -678,10 +680,10 @@ def generate_sections(improved_outline, model="gpt-3.5-turbo", max_tokens=1500):
 
 
 @st.cache_data(show_spinner=False)
-def improve_section(section, topic, sementic_readout, i, model="gpt-3.5-turbo", max_tokens=1500):
-    # prompt = f"Given the following section of the article: {section}, please make thorough and improvements to this section.Only provide the updated section, not the text of your recommendation, just make the changes. Always provide the updated section in valid Markdown please. As an experienced doctor try to compress each section in short, crispy and to the point sentences making it user friendly, without missing the important detail of the section, Also but don't say in the article as an experienced doctor I, etc etc. If it's possible create bullet friendly article. Don't write for doctors or journals! write it for patients, example: doctor may advice patients..., You should visit... etc . Also, try to use less technical words as much as possible, it should be in lemon language.  Never write conclusion in any section, example: In conclusion,..... . Updated Section with improvements:"
-    # prompt = f"Given the following section of the article: {section}, please make thorough and improvements to this section. use sementic readout in related sections to create SEO friendly article, sementic readout: {sementic_readout}.Please strictly remember to not include a section about semantic SEO itself, you are using the readout to better improve the overall article.  Don't Only provide the updated section, not the text of your recommendation, just make the changes. Please ensure to provide the updated sections in valid Markdown please. As an experienced doctor try to compress each section in short, crispy and to the point sentences making it user friendly please, without missing the important detail of the section, Also please ensure not to write these thing in the sections: As a medical professional bla,bla bla.., As an experienced doctor bla, bla, bla..., and similar phrases like this. For better readability, Please use bullet points and paragraphs in the article along as needed. Never write conclusion part in any section, for example- after completing any section information don't write- In conclusion, bla, bla, bla..... . Don't write for doctors or journals! write it for patients, example: write like this- doctor may advice patients..., You should visit... etc not like this- As a medical professionals, you should blah bla bla... . Also, try to use less technical words as much as possible, it should be in lemon language. Each section should be only related to the topic given, for example: if we are taking about stent placement for kidney stone, the section should not discuss for stent placement in veins. Don't repeat any information if it has been told earlier in any of the sentences. Please ensure not to write conclusion part at last of the any section, example: In conclusion, ..... .  Updated Section with improvements:"
-    prompt = f'''
+def improve_section(section, semantic_readout, Introduction_conclusion_input, topic, i, model="gpt-3.5-turbo", max_tokens=1500):
+    # good prompt = f"Given the following section of the article: {section}, please make thorough and improvements to this section. use sementic readout in related sections to create SEO friendly article, sementic readout: {sementic_readout}.Please strictly remember to not include a section about semantic SEO itself, you are using the readout to better inform your improving of the article.  Don't Only provide the updated section, not the text of your recommendation, just make the changes. Always provide the updated section in valid Markdown please. As an experienced doctor try to compress each section in short, crispy and to the point sentences making it user friendly please, without missing the important detail of the section, Also please ensure not to write this thing in the secctions: As a medical professional bla,bla bla.. As an experienced doctor bla, bla, bla, and othere like this. For better readability, Please use bullet points and paragraphs in the article along as needed. Never write conclusion part in any section, for example- after completing any section information don't write- In conclusion, bla, bla, bla..... . Don't write for doctors or journals! write it for patients, example: doctor may advice patients..., You should visit... etc . Also, try to use less technical words as much as possible, it should be in lemon language. Each section should be only related to the topic given, for example: if we are taking about stent placement for kidney stone, the section should not discuss for stent placement in veins. Don't repeat any information if it has been told earlier in any of the sentences. Never write conclusion part at last of the any section, example: In conclusion, ..... .  Updated Section with improvements:"
+    # prompt = f"Given the following section of the article: {section}, please thoroughly improve and optimize this section. Use semantic readout from related sections to create an SEO-friendly article. The semantic readout is: {sementic_readout}. Please refrain from including a section specifically about semantic SEO itself, and instead use the readout to inform your revisions. Only provide the updated section without the text of your recommendations, and make sure to format it in valid Markdown. As an experienced doctor, aim to condense each section into concise and straightforward sentences to make it user-friendly while retaining important details. Avoid using technical jargon as much as possible and use clear language. Each section should be relevant to the given {topic}. For instance, if we are discussing stent placement for kidney stones, avoid discussing stent placement in veins. Do not repeat information already mentioned earlier. Avoid writing conclusions within any section. Provide the updated section with improvements in bullet point format, along with paragraphs as necessary. Remember, the article should be written for patients, not doctors or journals. For example, you can say 'Your doctor may advise you...' or 'It is recommended that you visit...' Keep in mind to avoid mentioning yourself as an experienced doctor within the article. Please ensure the revised section is short, concise, and to the point, while maintaining the important details."
+    prompt =  f'''
     Given the following section of the article: {section}, please make thorough improvements to this section.
     
     Please provide the updated section without the text of your recommendation. Ensure that the updated sections are in valid Markdown format. As an experienced doctor, your goal is to compress each section into short, concise, and user-friendly sentences while including important details. Avoid using phrases such as "As a medical professional" or "As an experienced doctor" for better readability.
@@ -692,14 +694,11 @@ def improve_section(section, topic, sementic_readout, i, model="gpt-3.5-turbo", 
     - Use mix of bullet points and paragraphs for better readability,only when needed.
     - Always add section in valid markdown and heading.
     - Avoid technical jargon as much as possible. Use simple and understandable language.
-    - All the section should be related to the {topic}
+    - All the sections / headings / sub-headings are related to the {topic}, and so, it should not go beyond the intent of the {topic}.
     - Avoid using medicine names in the content.
     - Avoid repeating information if it has been mentioned earlier in the section.
+'''
 
-    Please ensure not to write a conclusion part in any section. Exclude phrases like "In conclusion" or similar.
-
-    Updated Section with Improvements:
-    '''
     prompt = str(prompt)
     improved_section = generate_content2(prompt, model=model, max_tokens=max_tokens)
     # st.markdown(improved_section)
@@ -718,7 +717,7 @@ def generate_summary(query, model="gpt-3.5-turbo", max_tokens=1000, temperature=
         messages=[
             {
                 "role": "system",
-                "content": "Generate a summary of the below article in 100 words in bullet points.",
+                "content": "Generate key points of the below article topic under 60 words in bullet points. strictly follow the word count limit. word count limit - 60",
             },
             {"role": "user", "content": query},
         ],
@@ -734,6 +733,46 @@ def generate_summary(query, model="gpt-3.5-turbo", max_tokens=1000, temperature=
     st.markdown(response)
     return response
 
+def generate_intro_topic(topic):
+    model = "text-davinci-003"
+    max_tokens = 500
+    temperature = 0.5
+    
+    prompt = f"what is the key topic name in this topic. : '{topic}' Please ensure to answer in 1-4 word, as per the context. for better understanding the name you can change it with synonyms, if required."
+    response = openai.Completion.create(
+        engine=model,
+        prompt=prompt,
+        max_tokens=max_tokens,
+        temperature=temperature,
+        n=1,
+        stop=None,
+    )
+
+    intro_topic = response.choices[0].text.strip()
+    
+    # print(intro_topic)
+    return intro_topic
+
+
+def generate_introduction(topic):
+    model = "text-davinci-003"
+    max_tokens = 500
+    temperature = 0.5
+
+    prompt = f"Generate an introductory overview on {topic}, highlighting its significance, followed by supporting data and additional insights, all within 100 words. Break the output in paragraphs. please please please ensure each paragraph should not go more than 20 words. on each request the way to answer should be different. the content should look like human generated, so craft it in lemon language. Begin by providing a concise and engaging introduction that sets the context for the {topic}. Describe the {topic} and its importance, captivating the reader's interest. After the introduction, incorporate relevant data, statistics, or research findings to provide valuable insights and evidence related to the {topic}. Explore noteworthy trends, patterns, or key points that emerge from the data, enriching the overview. Aim to create a comprehensive and informative overview that combines an introduction to the {topic} with supporting data and insights, leaving the reader eager to delve deeper into the article for a more thorough understanding. Always rememember that data should be of worldwide or of india, or of both"
+    response = openai.Completion.create(
+        engine=model,
+        prompt=prompt,
+        max_tokens=max_tokens,
+        temperature=temperature,
+        n=1,
+        stop=None,
+    )
+
+    introducion = response.choices[0].text.strip()   
+    st.header("Introduction") 
+    st.markdown(introducion)
+    return introducion
 
 @st.cache_data(show_spinner=False, experimental_allow_widgets=True)
 def generate_article(
@@ -765,18 +804,25 @@ def generate_article(
     )
 
     status.text("Improving the initial outline...")
-    # improved_outline = improve_outline(
-    #     initial_outline, semantic_readout, model=model, max_tokens=1000
-    # )
-    improved_outline = initial_outline
+    improved_outline = improve_outline(
+        initial_outline, semantic_readout, model=model, max_tokens=1000
+    )
+    # improved_outline = initial_outline
     # st.markdown(improved_outline,unsafe_allow_html=True)
 
-    status.text("Generating sections based on the outline...")
+    status.text("Generating sections based on the Improved outline...")
     sections = generate_sections(
         improved_outline, model=model, max_tokens=max_tokens_section
     )
 
+    status.text("Generating Summary...")
+
     summary = generate_summary(query)
+    
+    status.text("Generating Introduction...")
+
+    intro_topic = generate_intro_topic(topic)
+    Introduction = generate_introduction(intro_topic)
 
     status.text("Improving sections...")
 
@@ -786,7 +832,7 @@ def generate_article(
         status.text(f"Improving section {i+1} of {len(sections)}...")
         time.sleep(5)
         improved_sections.append(
-            improve_section(section_string, topic, semantic_readout, i, model=model, max_tokens=1200)
+            improve_section(section_string, semantic_readout, Introduction_conclusion_input, topic, i, model=model, max_tokens=1200)
         )
 
     qa_dict = faq(query)
@@ -802,9 +848,9 @@ def generate_article(
 
     # final_content = remove_roman_numbers(final_content)
     html_content = markdown.markdown(final_content)
-    summary_html = markdown.markdown(summary)
-    html = f"<h2>Summary</h2>" + summary_html
-    html = html + html_content
+    summary_html = f"<h2>Summary</h2>" + markdown.markdown(summary)
+    Introduction_html = f"<h2>Introduction</h2>" +  markdown.markdown(Introduction)
+    html = summary_html + Introduction_html + html_content
 
     # plain_text = html_to_text(html)
     # Set the display option to show the complete text of a column
@@ -1074,11 +1120,12 @@ def main():
     )
 
     topic = st.text_input("Enter topic:", placeholder="eg: Cancer: Causes, Symptoms, Treatment")
-    Introduction_conclusion_input = st.text_input("Main Topic for Intro & Conclusion", placeholder=" eg: Cancer")
-
+    Introduction_conclusion_input = "nothing, you can create an input box if needed."
     # Get user input for API key
     user_api_key = st.text_input("Enter your OpenAI API key", type="password")
     # word_count = st.number_input("Define Word Count", step=1, format="%d", value=0)
+
+    # Now 'word_count' will be an integer without any decimal points
 
     # Now 'word_count' will be an integer without any decimal points
 
@@ -1095,7 +1142,7 @@ def main():
     Blog_URL = st.text_input("Write Your Blog URL", placeholder="URL Without Space")
     Username = st.text_input("Username", placeholder="wordpress username")
     Password = st.text_input("Password", type="password", placeholder="wordpress password")
-    options = ["Draft", "Publish"]
+    options = ["Publish", "Draft"]
     status = st.selectbox("Select an Publishing Option:", options)
     Post_status = status.lower()
     if st.button("Publish Now"):
