@@ -1,5 +1,4 @@
-openai
-bs4
+openai==0.28
 nltk
 xlsxwriter
 newspaper3k
