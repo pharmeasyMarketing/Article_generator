@@ -739,7 +739,7 @@ def generate_intro_topic(topic):
     temperature = 0.5
     
     prompt = f"what is the key topic name in this topic. : '{topic}' Please ensure to answer in 1-4 word, as per the context. for better understanding the name you can change it with synonyms, if required."
-    response = openai.Completion.create(
+    response = openai.ChatCompletion.create(
         engine=model,
         prompt=prompt,
         max_tokens=max_tokens,
