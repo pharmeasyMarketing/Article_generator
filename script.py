@@ -611,11 +611,11 @@ def generate_semantic_improvements_guide(
     # return outline
 
 def generate_outline(topic, Introduction_conclusion_input, model="text-davinci-003", max_tokens=1000, temperature=1):
-    model = "gpt-3.5-turbo"
+    model = "text-davinci-003"
     # prompt = f"Generate a purposeful outline with intent-focused headings and subheadings, structured with proper Roman numerals, Roman numerals should be aligned well, for the topic: {topic}. The outline should effectively align with the intended scope of the topic. Utilize a hierarchical organization for the headings and subheadings, maintaining clarity and coherence. You may incorporate up to 10 levels of subheadings, depending on the topic's complexity, but only if necessary. Additionally, include an introductory section and a conclusion as headings, without subheadings, while ensuring they remain within the intended scope of the topic without providing detailed explanations."
     # prompt = f"Generate a purposeful outline with intent-focused headings and subheadings, structured with proper Roman numerals, Roman numerals should be aligned well, for the topic: {topic}. The outline should effectively align with the intended scope of the topic. Utilize a hierarchical organization for the headings and subheadings, maintaining clarity and coherence. Please please please strictly Avoid including the Introduction, overview and conclusion in the outline, ensuring that they are not part of the layout and never add them while generating the outline."
     prompt = f"Generate a purposeful outline with intent-focused headings and subheadings, structured with proper Roman numerals, Roman numerals should be aligned well, for the topic: {topic}. The outline should effectively align with the intended scope of the topic. Utilize a hierarchical organization for the headings and subheadings, maintaining clarity and coherence. Please please please strictly Avoid including the Introduction, overview and conclusion in the outline, ensuring that they are not part of the layout and never add them while generating the outline."
-    response = openai.ChatCompletion.create(
+    response = openai.Completion.create(
         engine=model,
         prompt=prompt,
         max_tokens=max_tokens,
@@ -734,12 +734,12 @@ def generate_summary(query, model="gpt-3.5-turbo", max_tokens=1000, temperature=
     return response
 
 def generate_intro_topic(topic):
-    model = "gpt-3.5-turbo"
+    model = "text-davinci-003"
     max_tokens = 500
     temperature = 0.5
     
     prompt = f"what is the key topic name in this topic. : '{topic}' Please ensure to answer in 1-4 word, as per the context. for better understanding the name you can change it with synonyms, if required."
-    response = openai.ChatCompletion.create(
+    response = openai.Completion.create(
         engine=model,
         prompt=prompt,
         max_tokens=max_tokens,
@@ -755,12 +755,12 @@ def generate_intro_topic(topic):
 
 
 def generate_introduction(topic):
-    model = "gpt-3.5-turbo"
+    model = "text-davinci-003"
     max_tokens = 500
     temperature = 0.5
 
     prompt = f"Generate an introductory overview on {topic}, highlighting its significance, followed by supporting data and additional insights, all within 100 words. Break the output in paragraphs. please please please ensure each paragraph should not go more than 20 words. on each request the way to answer should be different. the content should look like human generated, so craft it in lemon language. Begin by providing a concise and engaging introduction that sets the context for the {topic}. Describe the {topic} and its importance, captivating the reader's interest. After the introduction, incorporate relevant data, statistics, or research findings to provide valuable insights and evidence related to the {topic}. Explore noteworthy trends, patterns, or key points that emerge from the data, enriching the overview. Aim to create a comprehensive and informative overview that combines an introduction to the {topic} with supporting data and insights, leaving the reader eager to delve deeper into the article for a more thorough understanding. Always rememember that data should be of worldwide or of india, or of both"
-    response = openai.ChatCompletion.create(
+    response = openai.Completion.create(
         engine=model,
         prompt=prompt,
         max_tokens=max_tokens,
