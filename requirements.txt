@@ -11,3 +11,4 @@ markdownify
 pypandoc
 python-wordpress-xmlrpc
 markdown
+lxml_html_clean
